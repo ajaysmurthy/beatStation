@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Beatstation by SMC-INESC</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Beatstation</h1>
+        <p>beatStation - an openFrameworks tapping recorder interface </p>
+
+        <p class="view"><a href="https://github.com/SMC-INESC/beatStation">View the Project on GitHub <small>SMC-INESC/beatStation</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/SMC-INESC/beatStation/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/SMC-INESC/beatStation/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/SMC-INESC/beatStation">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="beatstation" class="anchor" href="#beatstation"><span class="octicon octicon-link"></span></a>beatStation</h1>
+
+<p>beatStation - an openFrameworks tapping recorder</p>
+
+<p>This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported License. To view a copy of this license, visit <a href="http://creativecommons.org/licenses/by-nc/3.0/">http://creativecommons.org/licenses/by-nc/3.0/</a>.</p>
+
+<p>This work is partly-funded by the ERDF - European Regional Development Fund through the COMPETE Programme (operational programme for competitiveness) and by National Funds through the FCT-  Fundacao para a Ciencia e a Tecnologia (Portuguese Foundation for Science and Technology) within project "PTDC/EAT-MMU/112255/2009-(FCOM-01-0124-FEDER-014732)"</p>
+
+<h1></h1>
+
+<h1>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>USAGE</h1>
+
+<p>The already build binaries can be download from: <a href="https://sourceforge.net/projects/beatstation/">https://sourceforge.net/projects/beatstation/</a></p>
+
+<p>Download the archive and extract/copy the directory on your local hard drive. </p>
+
+<p>Before starting the app you need to copy 2 or more sound files to annotate in the data/sounds/ subdirectory. </p>
+
+<p>You can also adjust different settings from the settings file. Take a look at the wiki page for more info. For instance, you can choose to tap with a midi interface or just use the keyboard. </p>
+
+<p>beatStation was designed as a game with a purpose application in which users can compete between each other in tapping various songs. In this setup, you need to have Octave or Matlab installed in order to compute the score for each user.</p>
+
+<p>beatStation can be used by researchers to annotate audio, conduct experiments, or as an inspiration for future apps.</p>
+
+<p>Contact me at miron.marius [at] gmail [dot] com for future questions</p>
+
+<h1></h1>
+
+<h1>
+<a name="building-" class="anchor" href="#building-"><span class="octicon octicon-link"></span></a>BUILDING </h1>
+
+<p>These are the MAC OSX and Windows versions. for the linux version go at: <a href="https://github.com/nkundiushuti/beatStationLinux">https://github.com/nkundiushuti/beatStationLinux</a></p>
+
+<h1></h1>
+
+<h1>
+<a name="macos-build" class="anchor" href="#macos-build"><span class="octicon octicon-link"></span></a>MACOS BUILD</h1>
+
+<p>You will need Mac Os version minimum 10.6 and XCode if you want to build the project again on your machine. You will also need the version 0.7.1 of openFrameworks. It is not likely that the latest version of openFrameworks will work with this app.
+The .app that you can find in the bin directory was built on Mac OS Lion and I suggest rebuilding it on your system. 
+You need to download openFrameworks and copy the beatStation directory into the /apps/myapps directory and then build it with Xcode (open and build beatStation.xcodeproj) and run it.</p>
+
+<h1></h1>
+
+<h1>
+<a name="windows-build" class="anchor" href="#windows-build"><span class="octicon octicon-link"></span></a>WINDOWS BUILD</h1>
+
+<p>You will need to have Codeblocks 10 installed.
+Download and install openframeworks 0.7.1 for linux and Codeblocks as specified on the website.
+Building DOES NOT work with later versions of Openframeworks or Codeblocks 
+Unpack addons.zip or download from github and copy in the openframeworks addons directory(not the project addons!), the following addons:</p>
+
+<ul>
+<li>ofxUI</li>
+<li>ofxXMLSettings</li>
+<li>ofxDirList</li>
+<li>ofxTextSuite</li>
+<li>ofxNetwork</li>
+</ul><p>Copy the beatStation directory in the apps/myapps directory, open the codeblocks project(beatStation.cbp) and CLEAN then BUILD.</p>
+
+<p>IMPORTANT - you must copy some audio files in the sounds directory before starting the app</p>
+
+<h1></h1>
+
+<h1>
+<a name="functionalities" class="anchor" href="#functionalities"><span class="octicon octicon-link"></span></a>FUNCTIONALITIES</h1>
+
+<p>The app has an user management system and a tapping recording system, as well as an ability to run tests on different machines connected in a client-server architecture. </p>
+
+<p>USER MANAGEMENT</p>
+
+<ul>
+<li>recorded in the data/users.xml folder</li>
+<li>each new user is required to enter the name, then a new ID is generated based on the name(ex: john doe - jd1 - the first user with the jd initials), plus an unique index id for each user. </li>
+<li>an existing user can log-in using the ID </li>
+<li>all the tappings will be stored in the data directory, in filenames corresponding to the user id, e.g. jd1.xml</li>
+</ul><p>TAP RECORDING</p>
+
+<ul>
+<li>once logged an user can listen to a song with PLAY, move to the next song with NEXT</li>
+<li>tappings are recorded in a vector for each song</li>
+<li>an user can always quit pressing QUIT button</li>
+<li>tappings are saved in an xml named with the user's ID each time an user hits quit or he finishes the tapping</li>
+<li>instructions are displayed with the INSTRUCTIONS button</li>
+<li>volume can be adjusted with the VOL slider</li>
+<li>the percentage played from a song can be seen in the rotary slider POS</li>
+</ul><p>CLIENT - SERVER ARCHITECTURE</p>
+
+<ul>
+<li>an user can log-in with the same id on the server and all clients machines</li>
+<li>by default, an app runs as a server if not changed from the settings.xml (isClient=1)</li>
+<li>if server, all users are stored on the users.xml file</li>
+<li>if client, the authentication happens on the server machine</li>
+<li>the server must be started in order for the clients to connect and authentication to take place</li>
+<li>tappings are stored locally for clients and server</li>
+</ul><p>THE SETTINGS FILE
+Several parameters can be modified using the settings.xml file
+</p>
+
+<pre><code>&lt;passToExit&gt;exit&lt;/passToExit&gt; the password used to exit the app
+
+&lt;verbose&gt;1&lt;/verbose&gt; more output on the connectivity between clients and server
+
+&lt;fullscreen&gt;1&lt;/fullscreen&gt; the app runs fullscreen
+
+&lt;fps&gt;1000&lt;/fps&gt; frames per second to run: more fps less delay but more computationally expensive
+
+&lt;midiPort&gt;0&lt;/midiPort&gt; - the midi port to run
+
+&lt;midiChannel&gt;0&lt;/midiChannel&gt; - the midi channel to listen to
+
+&lt;midiNote&gt;0&lt;/midiNote&gt; - the midi note which will trigger a tap
+
+&lt;noPlays&gt;2&lt;/noPlays&gt; - maximum number of times you can listen a song
+
+&lt;minTaps&gt;1&lt;/minTaps&gt; - minimum number of song tapped after which the score is displayed
+
+&lt;randomFiles&gt;1&lt;/randomFiles&gt; - play the file in an unique random order for each user
+
+&lt;tapWithSpace&gt;1&lt;/tapWithSpace&gt;
+
+&lt;tapWithTab&gt;1&lt;/tapWithTab&gt;
+
+&lt;canQuit&gt;1&lt;/canQuit&gt; - set this to 0 if you don't want to allow quitting during the test
+
+&lt;itemDimGUI&gt;24&lt;/itemDimGUI&gt; - item dimension - e.g. button size 
+
+&lt;launchScript&gt;0&lt;/launchScript&gt; - this option calls an octave script and computes some scores
+
+&lt;scriptDirectory&gt;XML4MAT&lt;/scriptDirectory&gt; - the directory in which the octave script resides
+
+&lt;appToLaunchPath&gt;/Applications/Octave.app/Contents/Resources/bin/octave -qf --quiet --eval "clear all; cd path; tapping2('xmlin','xmlout');exit;"&lt;/appToLaunchPath&gt; - the path to octave, matlab or whatever script you want to call. you must preserve the xmlin and xmlout structure, xmlin being the file with the tapping and xmlout the results file
+
+&lt;isClient&gt;0&lt;/isClient&gt; - this app is a server and listening to a port, taking care of user management, or is a client, just storing the taps for each user and not their data
+
+&lt;tcpPort&gt;9001&lt;/tcpPort&gt; - the tcp port used for client-server communication 
+
+&lt;ipServer&gt;127.0.0.1&lt;/ipServer&gt; - the ip of the server to connect to
+</code></pre>
+
+<p></p>
+
+<p>INSTRUCTIONS</p>
+
+<ul>
+<li>the app description from the first page can be changed from description.txt</li>
+<li>the instructions can be changed from instructions.txt</li>
+<li>the &lt;&gt; sequence is used for a new line</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/SMC-INESC">SMC-INESC</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
