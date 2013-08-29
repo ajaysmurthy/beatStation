@@ -11,7 +11,7 @@ This work is partly-funded by the ERDF - European Regional Development Fund thro
 USAGE
 ========================
 
-The already build binaries can be download from: https://sourceforge.net/projects/beatstation/
+The already build binaries can be download from: http://github.com/SMC-INESC/beatStation/releases
 
 Download the archive and extract/copy the directory on your local hard drive. 
 
