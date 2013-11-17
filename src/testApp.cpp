@@ -2,70 +2,84 @@
 
 //--------------------------------------------------------------
 void testApp::setup() {
-    
+
     //LOAD SETTINGS
-    loadXmlSettings("settings.xml"); 
-    
+    loadXmlSettings("settings.xml");
+
     //APP SETTINGS
     ofSetFrameRate(fps);
     //ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetEscapeQuitsApp(FALSE);
     if (fullscreen) ofSetFullscreen(1);
-    
-    
-    //LOAD USERS 
+
+
+    //LOAD USERS
     nrUsers = 0;
     maxID = 0;
-    if (isClient) 
+    if (isClient)
     {
         if (verbose) cout << " BEAT STATION CLIENT " << endl;
     }
     else
-    {    
+    {
         if (verbose) cout << " BEAT STATION SERVER " << endl;
-        loadXmlUser("data/users.xml"); 
+        loadXmlUser("data/users.xml");
     }
     //usert.initTranscription(numSounds);
     usert.setName("");
     usert.setFullName("");
     usert.setDate("");
-    usert.setID(-1);  
+    usert.setID(-1);
     usert.currentSound = -1;
     fromStart = FALSE;
     askResults = FALSE;
-    
-    
+
+
     //LOAD SOUNDS
     //DIR.setVerbose(false);
-    numSounds = DIR.listDir("sounds");
+    numSounds = DIR.listDir(SOUNDDIR);
     songNames = new string[numSounds];
+    descImgNames = new string[numSounds];
+    descTxtNames = new string[numSounds];
+    tempStr = new string[1];
     for(int i = 0; i < numSounds; i++){
         songNames[i] = DIR.getPath(i);
-    }  
+        tempStr[0] = DIR.getName(i);
+        int nameLen = tempStr[0].length();
+        descImgNames[i] = IMAGEDIR + tempStr[0].substr(0,nameLen-4) + ".png";
+        descTxtNames[i] = IMAGEDIR + tempStr[0].substr(0,nameLen-4) + ".txt";
+        cout << songNames[i] << endl;
+        cout << descTxtNames[i] << endl;
+        cout << descImgNames[i] << endl;
+    }
     if (numSounds<2) {cout << "NO SOUNDS IN THE SOUND DIRECTORY!" << endl; exitApp();}
     play = FALSE;
-    tempTime = 0; 
+    tempTime = 0;
     played = 0;
-    
-    
+
+
     //LOAD HIGHSCORES
-    loadXmlScores("data/scores.xml"); 
-    
+    loadXmlScores("data/scores.xml");
+
+    if (useMidi)
+    {
     ///////MIDI	INTERFACE
-    if (verbose) midiIn.listPorts();
+    /*
 	midiIn.openPort(midiPort);
 	//midiIn.openPort("IAC Pure Data In");	// by name
 	midiIn.ignoreTypes(false, false, false);
-    midiIn.addListener((ofxMidiListener *)this);    
-    
-    
+    midiIn.addListener((ofxMidiListener *)this);
+    */
+    }
+
+
     /////////// INITIALIZE GUI SETTINGS
-    float dim = itemDimGUI; 
-    float xInit = OFX_UI_GLOBAL_WIDGET_SPACING; 
+    float dim = itemDimGUI;
+    float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
     float length = ofGetHeight()-xInit;
-    vector<string> names; 
-    
-    
+    vector<string> names;
+
+
     //LOAD INSTRUCTIONS
     toggleInstructions1 = TRUE;
     toggleInstructions11 = TRUE;
@@ -73,6 +87,8 @@ void testApp::setup() {
     toggleInstructions3 = FALSE;
     toggleResults = FALSE;
     toggleScore = FALSE;
+    toggleTalaDesc = TRUE;
+
     ofBuffer buffer = ofBufferFromFile("instructions.txt"); // reading into the buffer
     if (buffer.size()>0) instrGUI2 = buffer.getText();
     else instrGUI2 = "";
@@ -82,107 +98,103 @@ void testApp::setup() {
     instrGUI1 = "If you are new user enter your name and click START. <> If you are a returning user please click EXISTING and enter your ID, then click START.";
     instructions1.init("GUI/newmediafett.ttf", 12);
     instructions1.setText(instrGUI1);
-    instructions1.wrapTextX(length);     
+    instructions1.wrapTextX(length);
     instructions1.setColor(240, 240, 240, 180);
     instructions11.init("GUI/newmediafett.ttf", 12);
     instructions11.setText(instrGUI11);
-    instructions11.wrapTextX(length);     
+    instructions11.wrapTextX(length);
     instructions11.setColor(240, 240, 240, 180);
     instructions2.init("GUI/newmediafett.ttf", 12);
     instructions2.setText(instrGUI2);
-    instructions2.wrapTextX(length);     
-    instructions2.setColor(240, 240, 240, 180);    
+    instructions2.wrapTextX(length);
+    instructions2.setColor(240, 240, 240, 180);
     text.clear();text.str("");
-    text << "Your tapping score is 0. <> You have tapped 0 songs. <> You can improve your score by resuming tapping at a later time. <>";  
+    text << "Your tapping score is 0. <> You have tapped 0 songs. <> You can improve your score by resuming tapping at a later time. <>";
     //needs to be replaced with the actual results
-    if (launchScript) 
-    {     
+    if (launchScript)
+    {
         results.init("GUI/newmediafett.ttf", 12);
         results.setText(text.str());
-        results.wrapTextX(ofGetHeight()-OFX_UI_GLOBAL_WIDGET_SPACING);     
+        results.wrapTextX(ofGetHeight()-OFX_UI_GLOBAL_WIDGET_SPACING);
         results.setColor(240, 240, 240, 180);
-    } 
+    }
     getScoreTable();
-    
+
     //copyleft
     copyleft.init("GUI/newmediafett.ttf", 12);
     copyleft.setText(instrGUI1);
     copyleft.setText("Copyright (c) 2012 by INESC TEC: Marius Miron, Andre Holzapfel, Matthew Davies, Fabien Gouyon. This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/3.0/. <> <> This work is partly-funded by the ERDF - European Regional Development Fund through the COMPETE Programme (operational programme for competitiveness) and by National Funds through the FCT - Fundacao para a Ciencia e a Tecnologia (Portuguese Foundation for Science and Technology) within project PTDC/EAT-MMU/112255/2009-(FCOM-01-0124-FEDER-014732)");
-    copyleft.wrapTextX(1.6*length); 
-    copyleft.setColor(240, 240, 240, 180); 
-    
+    //copyleft.setText("text");
+    copyleft.wrapTextX(1.6*length);
+    copyleft.setColor(240, 240, 240, 180);
+
+
     //GUI USER
-    gui1 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());		//ofxUICanvas(float x, float y, float width, float height)    
+    gui1 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());		//ofxUICanvas(float x, float y, float width, float height)
     gui1->addWidgetDown(new ofxUILabel("BEAT STATION", OFX_UI_FONT_LARGE));
     ofxUISpacer* spaceri = new ofxUISpacer(1.1*length, 2, "SPACER");
     gui1->addWidgetDown(spaceri);
-    
-    vector<string> vnames; vnames.push_back("NEW"); vnames.push_back("EXISTING"); 
-    ofxUIRadio *radio = (ofxUIRadio *) gui1->addWidgetDown(new ofxUIRadio("USER", vnames, OFX_UI_ORIENTATION_VERTICAL, dim, dim )); 
-    radio->activateToggle("NEW"); 
-    newUser = TRUE;    
-    
-    gui1->addSpacer(1.1*length, 2); 
-    gui1->addWidgetDown(new ofxUIButton("START",false, dim*2, dim*2, OFX_UI_FONT_MEDIUM)); 
+
+    vector<string> vnames; vnames.push_back("NEW"); vnames.push_back("EXISTING");
+    ofxUIRadio *radio = (ofxUIRadio *) gui1->addWidgetDown(new ofxUIRadio("USER", vnames, OFX_UI_ORIENTATION_VERTICAL, dim, dim ));
+    radio->activateToggle("NEW");
+    newUser = TRUE;
+
+    gui1->addSpacer(1.1*length, 2);
+    gui1->addWidgetDown(new ofxUIButton("START",false, dim*2, dim*2, OFX_UI_FONT_MEDIUM));
     ofxUIButton* scorest = new ofxUIButton("SCORES",false, dim*2, dim*2, OFX_UI_FONT_MEDIUM);
     gui1->addWidgetRight(scorest);
     if (!launchScript) scorest->setVisible(FALSE);
-    ofAddListener(gui1->newGUIEvent, this, &testApp::guiEvent1); 
-    
+    ofAddListener(gui1->newGUIEvent, this, &testApp::guiEvent1);
+
     gui1->addWidgetEastOf(new ofxUILabel("NAME", OFX_UI_FONT_MEDIUM),"USER");
     gui1->addWidgetSouthOf(new ofxUITextInput("ID", "", (length-xInit)/2),"NAME");
     ofxUILabel *errors = (ofxUILabel*) new ofxUILabel("ERRORS", OFX_UI_FONT_SMALL);
     errors->setVisible(FALSE);
-    gui1->addWidgetSouthOf(errors,"ID");  
-    
-    /*
-    ofxUIRectangle *rect = (ofxUIRectangle *) spaceri->getRect();  
-    ofxUISpacer* spacerh = new ofxUISpacer(2*itemDimGUI + 1.1*length, itemDimGUI + rect->getY() ,1.1*length,2, "SPACERHIDDEN");
-    gui1->addWidget(spacerh);
-    spacerh->setVisible(FALSE);
-    imgc = new ofImage(); 
-    imgc->loadImage("copyleft.png"); 
-    ofxUIImage* guimgc = new ofxUIImage(2*itemDimGUI + ofGetHeight()-length, 0, imgc->width/2, imgc->height/2, imgc, "", TRUE);
-    gui1->addWidgetSouthOf(guimgc, "SPACERHIDDEN");
-     */
-    
+    gui1->addWidgetSouthOf(errors,"ID");
     //gui1->centerWidgets();
     gui1->setDrawBack(false);
-    //gui1->disable();     
-    
-    /*
+    //gui1->disable();
+
     //use this too if you wanna use quiz
     //GUI QUIZ
     gui2 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
-    gui2->disable();      
-    gui2->addWidgetDown(new ofxUILabel("QUESTIONS", OFX_UI_FONT_LARGE)); 
-    gui2->addSpacer(1.3*length, 2); 
-    
+    gui2->disable();
+    gui2->addWidgetDown(new ofxUILabel("QUESTIONS", OFX_UI_FONT_LARGE));
+    gui2->addSpacer(1.3*length, 2);
+
     gui2->addWidgetDown(new ofxUILabel("AGE", OFX_UI_FONT_MEDIUM));
     gui2->addWidgetSouthOf(new ofxUITextInput("AGEN", "", (length-xInit)/10),"AGE");
-    vector<string> vs; vs.push_back("MALE"); vs.push_back("FEMALE");     
+    vector<string> vs; vs.push_back("MALE"); vs.push_back("FEMALE");
     ofxUIRadio *radios = (ofxUIRadio *) gui2->addWidgetSouthOf(new ofxUIRadio("GENDER", vs, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ),"AGEN");
-    radios->activateToggle("MALE"); 
+    radios->activateToggle("MALE");
     gui2->addWidgetDown(new ofxUILabel("YEARS OF MUSICAL TRAINING", OFX_UI_FONT_MEDIUM));
     gui2->addWidgetDown(new ofxUITextInput("YEARS", "", (length-xInit)/10));
-    vector<string> vy; vy.push_back("LOW"); vy.push_back("MEDIUM"); vy.push_back("HIGH");  
+    vector<string> vy; vy.push_back("LOW"); vy.push_back("MEDIUM"); vy.push_back("HIGH");
     ofxUIRadio *radioy = (ofxUIRadio *) gui2->addWidgetDown(new ofxUIRadio("FAMILIARITY WITH TURKISH MUSIC", vy, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ));
-    radioy->activateToggle("LOW"); 
+    radioy->activateToggle("LOW");
     gui2->setDrawBack(false);
     gui2->addWidgetDown(new ofxUIButton("NEXT",false, dim*2, dim*2, OFX_UI_FONT_MEDIUM));
     ofxUILabel *errors1 = (ofxUILabel*) new ofxUILabel("ERRORS", OFX_UI_FONT_MEDIUM);
     errors1->setVisible(FALSE);
-    gui2->addWidgetEastOf(errors1,"NEXT");   
-    ofAddListener(gui2->newGUIEvent, this, &testApp::guiEvent2); 
+    gui2->addWidgetEastOf(errors1,"NEXT");
+
+    //vector<string> vy; vy.push_back("LOW"); vy.push_back("MEDIUM"); vy.push_back("HIGH");
+    /*
+    ofxUIDropDownList *expDropDown;
+    expDropDown = new ofxUIDropDownList(200, "Experience", vy, OFX_UI_FONT_SMALL);
+    expDropDown->setAllowMultiple(false);
+    gui2->addWidgetDown(expDropDown);
     */
-    
+    ofAddListener(gui2->newGUIEvent, this, &testApp::guiEvent2);
+
     //GUI PRE-TEST
     gui3 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
-    gui3->disable();      
-    gui3->addWidgetDown(new ofxUILabel("INSTRUCTIONS", OFX_UI_FONT_LARGE)); 
-    gui3->addSpacer(1.1*length, 2); 
+    gui3->disable();
+    gui3->addWidgetDown(new ofxUILabel("INSTRUCTIONS", OFX_UI_FONT_LARGE));
+    gui3->addSpacer(1.1*length, 2);
     ofColor black(0, 0, 0);
-    ofxUILabel* id1 = new ofxUILabel("ID", OFX_UI_FONT_MEDIUM);    
+    ofxUILabel* id1 = new ofxUILabel("ID", OFX_UI_FONT_MEDIUM);
     id1->setColorFill(black);
     gui3->addWidgetDown(id1);
     gui3->setDrawBack(false);
@@ -192,112 +204,147 @@ void testApp::setup() {
     gui3->addWidgetDown(new ofxUIButton("START",false, dim*2, dim*2, OFX_UI_FONT_MEDIUM));
     ofxUISpacer* sp = new ofxUISpacer(0.5*length, 2, "SPACER1");
     gui3->addWidgetEastOf(sp, "SPACER");
-    img = new ofImage(); 
-    img->loadImage("screen.png"); 
+    img = new ofImage();
+    img->loadImage("screen.png");
     ofxUIImage* guimg = new ofxUIImage(2*itemDimGUI + ofGetHeight()-length, 0, img->width, img->height, img, "SNAPSHOT OF THE TAPPING INTERFACE", TRUE);
     gui3->addWidgetEastOf(guimg, "SPACER");
     sp->setVisible(FALSE);
-    ofAddListener(gui3->newGUIEvent, this, &testApp::guiEvent3); 
-    
-    
+    ofAddListener(gui3->newGUIEvent, this, &testApp::guiEvent3);
+
+
     //GUI TEST
     gui4 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
-    gui4->disable();    
-    gui4->addWidgetDown(new ofxUILabel("BEAT STATION", OFX_UI_FONT_LARGE));    
-    gui4->addSpacer(1.1*length, 2); 
-    
+    gui4->disable();
+    gui4->addWidgetDown(new ofxUILabel("BEAT STATION", OFX_UI_FONT_LARGE));
+    ofxUISpacer* sp401 = new ofxUISpacer(1.1*length, 2, "SPACER401");
+    gui4->addWidgetDown(sp401);
+
     ofxUIButton* play = new ofxUIButton("PLAYF",false, dim*2, dim*2);
     play->setLabelVisible(FALSE);
-    gui4->addWidgetDown(play);    
+    gui4->addWidgetDown(play);
     ofxUIButton* next = new ofxUIButton("NEXTF",false, dim*2, dim*2);
     next->setLabelVisible(FALSE);
     gui4->addWidgetDown(next);
-    
-    gui4->addSpacer(1.1*length, 2);  
-    
+
+    gui4->addSpacer(1.1*length, 2);
+
     gui4->addWidgetDown(new ofxUIButton("INSTRUCTIONS",false, dim*2, dim*2));
-    //ofxUILabel* tap = new ofxUILabel("TAP USING SPACE BAR", OFX_UI_FONT_MEDIUM);   
+    //ofxUILabel* tap = new ofxUILabel("TAP USING SPACE BAR", OFX_UI_FONT_MEDIUM);
     //tap->setColorFill(black);
     //gui4->addWidgetDown(tap);
-    ofxUILabel* id2 = new ofxUILabel("ID", OFX_UI_FONT_MEDIUM);    
+    ofxUILabel* id2 = new ofxUILabel("ID", OFX_UI_FONT_MEDIUM);
     id2->setColorFill(black);
-    gui4->addWidgetDown(id2); 
+    gui4->addWidgetDown(id2);
     ofxUIButton* quitButton = new ofxUIButton("QUIT",false, dim*2, dim*2);
-    gui4->addWidgetEastOf(quitButton,"INSTRUCTIONS"); 
+    gui4->addWidgetEastOf(quitButton,"INSTRUCTIONS");
     if (canQuit) quitButton->setVisible(TRUE);
     else quitButton->setVisible(FALSE);
-    
+
     ofxUILabel* playl = new ofxUILabel("PLAY AGAIN", OFX_UI_FONT_SMALL);
     gui4->addWidgetEastOf(playl,"PLAYF");
     gui4->addWidgetEastOf(new ofxUILabel("NEXT SONG", OFX_UI_FONT_SMALL),"NEXTF");
     gui4->addWidgetEastOf(new ofxUILabel("SONG ID", OFX_UI_FONT_MEDIUM),"PLAY AGAIN");
     gui4->addWidgetSouthOf(new ofxUIRotarySlider(dim*3, 0, 100, 0.0, "%"),"SONG ID");
-    gui4->addWidgetEastOf(new ofxUISlider("VOL", 0.0, 99.0, 75.0, dim, dim * 3),"%");  
+    gui4->addWidgetEastOf(new ofxUISlider("VOL", 0.0, 99.0, 75.0, dim, dim * 3),"%");
     playl->setLabel("PLAY");
-    ofxUILabel *errors1 = (ofxUILabel*) new ofxUILabel("PLEASE WAIT...", OFX_UI_FONT_MEDIUM);
-    errors1->setVisible(FALSE);
-    gui4->addWidgetEastOf(errors1,"QUIT");
-    ofAddListener(gui4->newGUIEvent, this, &testApp::guiEvent4); 
+    ofxUILabel *ferrors1 = (ofxUILabel*) new ofxUILabel("PLEASE WAIT...", OFX_UI_FONT_MEDIUM);
+    ferrors1->setVisible(FALSE);
+    gui4->addWidgetEastOf(ferrors1,"QUIT");
+    ofxUISpacer* sp4 = new ofxUISpacer(length, 2, "SPACER1");
+    gui4->addWidgetEastOf(sp4, "SPACER401");
+    img4 = new ofImage();
+    img4->loadImage("screen.png");
+    guimg4 = new ofxUIImage(2*itemDimGUI + ofGetHeight()-length, 0, img4->width, img4->height, img4, "Tala Description",false);
+    gui4->addWidgetEastOf(guimg4, "SPACER401");
+    talaDesc = (ofxUILabel*) new ofxUILabel("talaDesc", OFX_UI_FONT_SMALL);
+    gui4->addWidgetNorthOf(talaDesc, "Tala Description");
+    talaDesc->setVisible(True);
+    sp4->setVisible(False);
+    ofAddListener(gui4->newGUIEvent, this, &testApp::guiEvent4);
     //gui4->centerWidgets();
     gui4->setDrawBack(false);
-    
-    
+
     //GUI RESULTS
     gui5 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
-    gui5->disable(); 
-    gui5->addWidgetDown(new ofxUILabel("THANK YOU!", OFX_UI_FONT_LARGE)); 
-    gui5->addSpacer(1.1*length, 2); 
-    ofxUILabel* id3 = new ofxUILabel("ID", OFX_UI_FONT_MEDIUM);    
+    gui5->disable();
+    gui5->addWidgetDown(new ofxUILabel("THANK YOU!", OFX_UI_FONT_LARGE));
+    gui5->addSpacer(1.1*length, 2);
+    ofxUILabel* id3 = new ofxUILabel("ID", OFX_UI_FONT_MEDIUM);
     id3->setColorFill(black);
     gui5->addWidgetDown(id3);
     ofxUISpacer* spacer2 = new ofxUISpacer(length, results.getHeight(), "SPACER2");
-    gui5->addWidgetDown(spacer2);    
-    gui5->addWidgetDown(new ofxUIButton("FINISH",false, dim*2, dim*2)); 
+    gui5->addWidgetDown(spacer2);
+    gui5->addWidgetDown(new ofxUIButton("FINISH",false, dim*2, dim*2));
     ofxUILabel *errors2 = (ofxUILabel*) new ofxUILabel("PLEASE WAIT...", OFX_UI_FONT_MEDIUM);
     errors2->setVisible(FALSE);
     gui5->addWidgetEastOf(errors2,"FINISH");
     spacer2->setVisible(FALSE);
-    ofAddListener(gui5->newGUIEvent, this, &testApp::guiEvent5);     
-    gui5->setDrawBack(false);  
-       
-    
-    
-    //TCP CLIENT SERVER   
-    if (isClient) 
+    ofAddListener(gui5->newGUIEvent, this, &testApp::guiEvent5);
+    gui5->setDrawBack(false);
+
+
+
+    //TCP CLIENT SERVER
+    if (isClient)
     {
         //are we connected to the server - if this fails we
         //will check every few seconds to see if the server exists
         weConnected = tcpClient.setup(ipServer, tcpPort);
-        
+
         sendToServer = FALSE;
         connectTime = 0;
         deltaTime = 0;
-        
+
     }
     else
     {
         //setup the server to listen on specific port
-        tcpServer.setup(tcpPort);        
+        tcpServer.setup(tcpPort);
     }
-    
+
 }
 
 
 //--------------------------------------------------------------
 void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
-    
+
     if (ofIsStringInString(password, passToExit)) exitApp();
-    
+
     if (play)
     {
         //ofSleepMillis(1000);
         beats.play();
         play = FALSE;
     }
-   
-    //WHILE SOUND PLAYING, UPDATE ROTARY SLIDER
+
+    //WHILE SOUND PLAYING, GET MIDI TAPPING, UPDATE ROTARY SLIDER
     if (beats.getIsPlaying())
-    {       
+    {
+        if (useMidi)
+        {
+/*
+        ////TO BE TESTED
+        if (midiMessage.status == MIDI_CONTROL_CHANGE)
+        {
+            if ((midiChannel == 0) && (midiNote == 0))
+                usert.sounds[usert.currentSound].time1.push_back(beats.getPositionMS());
+            else tempTime = beats.getPositionMS();
+        }
+        //this can happen on a future call
+        if ((midiChannel != 0) && (midiNote != 0))
+            if ((tempTime != 0) && (midiMessage.pitch!=0))
+            {
+                if (midiMessage.pitch==midiNote)
+                {
+                    usert.sounds[usert.currentSound].time1.push_back(tempTime);
+                    //if (verbose) cout << " " << tempTime;
+                }
+                tempTime = 0;
+            }
+            */
+        }
+
+
         //update playing widget
         ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui4->getWidget("%");
         rotary->setValue(beats.getPosition()*100);
@@ -305,53 +352,55 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
     }
     else
     {
-        if (played==1) 
+        if (played==1)
         {
             //update the play button label
             ofxUILabel* playl = (ofxUILabel *) gui4->getWidget("PLAY AGAIN");
             playl->setLabel("PLAY AGAIN");
         }
-        if (played>0) 
+        if (played>0)
         {
             //update playing widget
             ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui4->getWidget("%");
             if (rotary->getValue()>0) rotary->setValue(100);
         }
     }
-    
-    
+
+
     //SET VOLUME
     ofxUISlider *volume = (ofxUISlider *) gui4->getWidget("VOL");
-    beats.setVolume(volume->getValue());    
-    
-    
-    if (launchScript) 
-    {          
-        
+    beats.setVolume(volume->getValue());
+
+
+
+    if (launchScript)
+    {
+
+
         if (askResults)
         {
-            ofxUILabel *errors1 = (ofxUILabel*) gui4->getWidget("PLEASE WAIT...");
-            ofxUILabel *errors2 = (ofxUILabel*) gui5->getWidget("PLEASE WAIT...");
+            ofxUILabel *ferrors1 = (ofxUILabel*) gui4->getWidget("PLEASE WAIT...");
+            ofxUILabel *ferrors2 = (ofxUILabel*) gui5->getWidget("PLEASE WAIT...");
             ofxUIButton *finish = (ofxUIButton*) gui5->getWidget("FINISH");
-            
-            errors1->setVisible(TRUE);
-            errors2->setVisible(TRUE);
-            
-            if (!matlabScript.isRunning()) 
+
+            ferrors1->setVisible(TRUE);
+            ferrors2->setVisible(TRUE);
+
+            if (!matlabScript.isRunning())
             {
-                //ofSleepMillis(1 * 1000);  
+                //ofSleepMillis(1 * 1000);
                 finish->setVisible(TRUE);
-                errors1->setVisible(FALSE);
-                errors2->setVisible(FALSE);
+                ferrors1->setVisible(FALSE);
+                ferrors2->setVisible(FALSE);
                 loadXmlResults();
                 saveXmlScores("data/scores.xml");
                 toggleResults = TRUE;
                 askResults = FALSE;
-            } 
+            }
         }
     }
-    
-    
+
+
     //USER MANAGEMENT, TCP CLIENT/SERVER
     int code=-1;
     vector<string> tokens;
@@ -359,23 +408,23 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
     bool safeToStart = FALSE;
     ofxUILabel *errors1 = (ofxUILabel*) gui1->getWidget("ERRORS");
     //use this too if you wanna use quiz
-    //ofxUILabel *errors2 = (ofxUILabel*) gui2->getWidget("ERRORS");
-    
+    ofxUILabel *errors2 = (ofxUILabel*) gui2->getWidget("ERRORS");
+
     //IMPORTANT! we have to be careful with this because it will happen every frame like in a loop
-    
+
     //if SERVER, first we add any users from the clients
     //SERVER LISTENING FOR NEW USERS EVERY FRAME
     if ((!isClient) && (tcpServer.getLastID() >0) )
     {
-        //for each connected client lets get the data being sent 
+        //for each connected client lets get the data being sent
         for(int i = 0; i < tcpServer.getLastID(); i++)
-        {   
+        {
             //receive a message
             msgRx = "";
             if( !tcpServer.isClientConnected(i) )continue;
             msgRx = tcpServer.receive(i);
-            
-            if (msgRx.length() > 0) 
+
+            if (msgRx.length() > 0)
             {
                 //parse the message
                 tokens = ofSplitString(msgRx.c_str(),"<&>");
@@ -393,17 +442,17 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                     {
                         //get the max id with the existing user with same initials
                         code = checkUser(userName);
-                        
+
                         //increment maxID and nrUsers
                         maxID++;
                         nrUsers++;
-                        
-                        //send back the data                        
+
+                        //send back the data
                         text.clear();text.str("");
-                        text << maxID << "<&>" << userName << code << "<&>";                        
+                        text << maxID << "<&>" << userName << code << "<&>";
                         tcpServer.send(i, text.str());
                         if(verbose) cout << " sent back to client " << text.str() << endl;
-                        
+
                         //add new user
                         uIDs.push_back(maxID);
                         text.clear();text.str("");
@@ -412,57 +461,57 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                         uFullNames.push_back(userFullName);
                         uDate.push_back(userDate);
                         //use this too if you wanna use quiz
-                        //uAge.push_back(ofToInt(tokens[2]));
-                        //uMF.push_back(ofToInt(tokens[3]));
-                        //uYears.push_back(ofToInt(tokens[4]));
-                        //uFam.push_back(ofToInt(tokens[5]));
+                        uAge.push_back(ofToInt(tokens[2]));
+                        uMF.push_back(ofToInt(tokens[3]));
+                        uYears.push_back(ofToInt(tokens[4]));
+                        uFam.push_back(ofToInt(tokens[5]));
                     }
                     else
                     {
                         //get the max id with the existing user with same initials
                         code = getUserID(userName);
-                        
+
                         //send back the data
                         text.clear();text.str("");
-                        text << code << "<&>";                        
+                        text << code << "<&>";
                         tcpServer.send(i, text.str());
                         if(verbose) cout << " sent back to client " << text.str() << endl;
-                    }   
+                    }
                 }
                 //clear the tokens vector so we can receive a new message
                 tokens.clear();
             }
-        }  
+        }
     }
-    
+
     //then we add the new local user
     if (fromStart)
     {
         code = -1;
-        
+
         if (isClient) //CLIENT
         {
             msgRx="";
-            
+
             //send the data to server and get the message
             if (sendToServer)
             {
                 //we are connected - lets send our text and check what we get back
                 if(weConnected){
                     if(verbose) cout << " connected to server " << endl;
-                    
+
                     //what we need to send
                     text.clear();text.str("");
                     //use this instead if you wanna use quiz
-                    //text << newUser << "<&>" << tempName << "<&>" << tempAge << "<&>" << tempMF << "<&>" << tempYears << "<&>" << tempFam << "<&>";
-                    text << newUser << "<&>" << tempName << "<&>" << tempFullName << "<&>" << tempDate << "<&>";
-                    
+                    text << newUser << "<&>" << tempName << "<&>" << tempAge << "<&>" << tempMF << "<&>" << tempYears << "<&>" << tempFam << "<&>";
+                    //text << newUser << "<&>" << tempName << "<&>" << tempFullName << "<&>" << tempDate << "<&>";
+
                     if(tcpClient.send(text.str()))
                     {
                         //ok we manage to send it so we can exit the loop
                         sendToServer = FALSE;
                         if(verbose) cout << " sent message to server " << endl;
-                        
+
                         //if data has been sent lets receive the response
                         string str = tcpClient.receive();
                         if( str.length() > 0 ){
@@ -478,23 +527,22 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                         if(verbose) cout << " attempting to reconnect to server " << endl;
                         weConnected = tcpClient.setup(ipServer, tcpPort);
                         connectTime = ofGetElapsedTimeMillis();
-                        /* //use this instead if you wanna use quiz
+                        //use this instead if you wanna use quiz
                         if (newUser)
                         {
                             errors2->setLabel("CONNECTING...");
-                            errors2->setVisible(TRUE);                           
+                            errors2->setVisible(TRUE);
                         }
                         else
                         {
                             errors1->setLabel("CONNECTING...");
                             errors1->setVisible(TRUE);
                         }
-                         */
-                        errors1->setLabel("CONNECTING...");
-                        errors1->setVisible(TRUE);
-                    }        
+                        //errors1->setLabel("CONNECTING...");
+                        //errors1->setVisible(TRUE);
+                    }
                 }
-            } 
+            }
             else
             {
                 //if data has been sent lets receive the response
@@ -503,33 +551,33 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                     if(verbose) cout << " received back message " << str << endl;
                     msgRx = str;
                     //use this instead if you wanna use quiz
-                    //if (newUser) errors2->setVisible(FALSE); 
-                    //else errors1->setVisible(FALSE);
-                    errors1->setVisible(FALSE);
+                    if (newUser) errors2->setVisible(FALSE);
+                    else errors1->setVisible(FALSE);
+                    //errors1->setVisible(FALSE);
                 }
             }
-            
+
             //ok we finally received our message back from the server
-            if (msgRx.length()>0) 
+            if (msgRx.length()>0)
             {
                 //parse the message
                 if (newUser)
                 {
-                    tokens = ofSplitString(msgRx.c_str(),"<&>"); 
-                    code = ofToInt(tokens[0]); 
-                    tempName = tokens[1]; 
+                    tokens = ofSplitString(msgRx.c_str(),"<&>");
+                    code = ofToInt(tokens[0]);
+                    tempName = tokens[1];
                 }
                 else
                 {
                     tokens = ofSplitString(msgRx.c_str(),"<&>");
-                    code = ofToInt(tokens[0]);   
+                    code = ofToInt(tokens[0]);
                 }
                 safeToStart = TRUE;
                 tokens.clear();
             }
             else
             {
-                /* //use this instead if you wanna use quiz
+                //use this instead if you wanna use quiz
                 if (newUser)
                 {
                     errors2->setLabel("AUTHENTICATING...");
@@ -540,9 +588,8 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                     errors1->setLabel("AUTHENTICATING...");
                     errors1->setVisible(TRUE);
                 }
-                 */
-                errors1->setLabel("AUTHENTICATING...");
-                errors1->setVisible(TRUE);
+                //errors1->setLabel("AUTHENTICATING...");
+                //errors1->setVisible(TRUE);
             }
         }
         else //SERVER
@@ -551,8 +598,8 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
             {
                 //get the max id with the existing user with same initials
                 code = checkUser(tempName);
-                
-                //assign an ID to the new user, the maximum ID + 1 
+
+                //assign an ID to the new user, the maximum ID + 1
                 maxID++;
                 nrUsers++;
                 uIDs.push_back(maxID);
@@ -562,56 +609,56 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                 uFullNames.push_back(tempFullName);
                 uDate.push_back(tempDate);
                 //use this too if you wanna use quiz
-                //uAge.push_back(tempAge);
-                //uMF.push_back(tempMF);
-                //uYears.push_back(tempYears);
-                //uFam.push_back(tempFam);
-                
+                uAge.push_back(tempAge);
+                uMF.push_back(tempMF);
+                uYears.push_back(tempYears);
+                uFam.push_back(tempFam);
+
                 //initialize the current user
                 code = maxID;
-                tempName = text.str(); 
-                
+                tempName = text.str();
+
                 //save all the existing users!
                 saveXmlUser("data/users.xml");
             }
             //get the max id with the existing user with same initials
-            else code = getUserID(tempName);     
-            
+            else code = getUserID(tempName);
+
             safeToStart = TRUE;
         }
-        
-        //if we already have an user set, let's make everything ready 
+
+        //if we already have an user set, let's make everything ready
         if (safeToStart)
         {
             //now we check what we've got
-            if (code == -1) 
+            if (code == -1)
             {
                 errors1->setLabel("ERROR! THE USER WITH THIS ID DOESN'T EXIST IN THE DATABASE");
                 errors1->setVisible(TRUE);
                 safeToStart = FALSE;
                 fromStart = FALSE;
             }
-            else 
+            else
             {
                 usert.setID(code);
-                usert.setName(tempName); 
+                usert.setName(tempName);
                 safeToStart = TRUE;
             }
         }
-        
-        //if we already have an user set, let's make everything ready 
+
+        //if we already have an user set, let's make everything ready
         if (safeToStart)
         {
             //just to be safe, we save all the user list
-            if (!isClient) saveXmlUser("data/users.xml");          
-                                    
+            if (!isClient) saveXmlUser("data/users.xml");
+
             if (newUser) //LOAD INSTRUCTIONS
             {
                 //init transcription
-                usert.initTranscription(numSounds);  
+                usert.initTranscription(numSounds);
                 usert.currentSound = 0;
-                randomOrder(usert.getID());               
-                
+                randomOrder(usert.getID());
+
                 //LOAD THE INSTRUCTIONS GUI
                 text.clear();text.str("");
                 text << "PLEASE REMEMBER YOUR USER ID: " << usert.getName() << " ";
@@ -621,50 +668,50 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                 userL1->setLabel(text.str());
                 //toggleInstructions1 = FALSE;
                 toggleInstructions2 = TRUE;
-                
+
                 //use this instead if you wanna use quiz
-                //gui2->disable();
-                gui1->disable();
+                gui2->disable();
+                //gui1->disable();
                 gui3->enable();
             }
-            else //LOAD TAPPING 
+            else //LOAD TAPPING
             {
                 //load transcription
-                usert.initTranscription(numSounds);  
+                usert.initTranscription(numSounds);
                 text.clear();text.str("");
                 text << "data/" << tempName << ".xml";
-                loadXmlTap(text.str());                   
+                loadXmlTap(text.str());
                 randomOrder(usert.getID());
-                
+
                 //LOAD TAPPING INTERFACE
                 loadTapping(0);
             }
-            
+
             fromStart = FALSE;
         }
-        
+
     }
-    
-    
+
+
 }
 
 //--------------------------------------------------------------
 void testApp::draw() {
 	ofSetColor(0);
-    ofBackground(150, 150, 150, 190); 
-    ofPushStyle(); 
-	//ofEnableBlendMode(OF_BLENDMODE_ALPHA); 
-    
+    ofBackground(150, 150, 150, 190);
+    ofPushStyle();
+	//ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+
     // update the sound playing system:
-	ofSoundUpdate();	
-    
-        
+	ofSoundUpdate();
+
+
     if (toggleInstructions1)
     {
         //draw instructions
         //instructions.drawJustified(0, 0, instructions.getWidth());
         ofxUIButton *button = (ofxUIButton *) gui1->getWidget("START");
-        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect();  
+        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect();
         instructions1.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + button->getPadding());
     }
     if (toggleInstructions11)
@@ -672,35 +719,34 @@ void testApp::draw() {
         //draw instructions
         //instructions.drawJustified(0, 0, instructions.getWidth());
         ofxUISpacer *label = (ofxUISpacer *) gui1->getWidget("SPACER");
-        ofxUIRectangle *rect = (ofxUIRectangle *) label->getRect();  
+        ofxUIRectangle *rect = (ofxUIRectangle *) label->getRect();
         instructions11.drawLeft(2*itemDimGUI + rect->getX() + rect->getWidth() ,rect->getY());
-        
+
         //draw copyleft
         copyleft.drawLeft(2*itemDimGUI + rect->getX() + rect->getWidth(), itemDimGUI + instructions11.getHeight() + rect->getY());
-        
     }
-    
+
     /*
     if (toggleScore)
     {
         //draw score table
         ofxUIButton *button = (ofxUIButton *) gui1->getWidget("START");
-        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect();          
+        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect();
         //scoreTable.drawJustified(rect->getX(), rect->getY() + rect->getHeight() + instructions1.getHeight() + button->getPadding(), 2.2*scoreTable.getWidth());
         scoreTable1.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + instructions1.getHeight() + button->getPadding());
         //scoreTable2.drawCenter(2*itemDimGUI +rect->getX()+scoreTable1.getWidth(), rect->getY() + rect->getHeight() + instructions1.getHeight() + button->getPadding());
         scoreTable3.drawCenter(2*itemDimGUI +rect->getX()+scoreTable1.getWidth(), rect->getY() + rect->getHeight() + instructions1.getHeight() + button->getPadding());
         scoreTable4.drawCenter(5*itemDimGUI +rect->getX()+scoreTable1.getWidth()+scoreTable3.getWidth(), rect->getY() + rect->getHeight() + instructions1.getHeight() + button->getPadding());
-        
+
     }
     */
-    
+
     if (toggleInstructions2)
     {
         //draw instructions
         //instructions.drawJustified(0, 0, instructions.getWidth());
         ofxUIButton *button = (ofxUIButton *) gui3->getWidget("ID");
-        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect(); 
+        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect();
         instructions2.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + button->getPadding());
     }
     if (toggleInstructions3)
@@ -708,7 +754,7 @@ void testApp::draw() {
         //draw instructions
         //instructions.drawJustified(0, 0, instructions.getWidth());
         ofxUIButton *button = (ofxUIButton *) gui4->getWidget("ID");
-        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect(); 
+        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect();
         instructions2.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + button->getPadding());
     }
     if ((launchScript) && (toggleResults))
@@ -716,11 +762,11 @@ void testApp::draw() {
         //draw instructions
         //instructions.drawJustified(0, 0, instructions.getWidth());
         ofxUILabel *label = (ofxUILabel *) gui5->getWidget("ID");
-        ofxUIRectangle *rect = (ofxUIRectangle *) label->getRect(); 
+        ofxUIRectangle *rect = (ofxUIRectangle *) label->getRect();
         results.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + label->getPadding());
-    } 
-    
-    
+    }
+
+
 }
 
 //--------------------------------------------------------------
@@ -732,106 +778,96 @@ void testApp::exit() {
         text << "data/" << usert.getName() << ".xml";
         saveXmlTap(text.str());
     }
-    
-    saveXmlScores("data/scores.xml"); 
-    
+
+    saveXmlScores("data/scores.xml");
+
     if (isClient) tcpClient.close();
-    else if (tcpServer.close()) 
+    else if (tcpServer.close())
     {
         tcpServer.unlock();
         tcpServer.stopThread();
         //save all the existing users!
         saveXmlUser("data/users.xml");
     }
-    
+
     matlabScript.stop();
-    
+
     delete gui1;
     //use this if you plan to use quiz
-    //delete gui2;
+    delete gui2;
     delete gui3;
     delete gui4;
 	delete gui5;
     delete img;
-    
-	// clean up
-	midiIn.closePort();
-	midiIn.removeListener(this);    
-    
-}
 
-//--------------------------------------------------------------
-void testApp::newMidiMessage(ofxMidiMessage& msg) {
-    
-	// make a copy of the latest message
-	midiMessage = msg;
-    
-    //if (midiMessage.status == MIDI_CONTROL_CHANGE) cout << " BEAT ";
-    
-    if (beats.getIsPlaying())
+    if (useMidi)
     {
-        
-        ////TO BE TESTED
-        if (midiMessage.status == MIDI_CONTROL_CHANGE)
-        { 
-            //if (verbose) cout << "BEAT ";
-            if ((midiChannel == 0) && (midiNote == 0)) 
-                usert.sounds[usert.currentSound].time1.push_back(beats.getPositionMS()); 
-            else tempTime = beats.getPositionMS();
-        }
-        
-        //this can happen on a future call
-        if ((midiChannel != 0) && (midiNote != 0)) 
-            if ((tempTime != 0) && (midiMessage.pitch!=0))
-            { 
-                //if (verbose) cout << "  " << midiMessage.pitch;
-                if (midiMessage.pitch==midiNote)
-                {
-                    usert.sounds[usert.currentSound].time1.push_back(tempTime); 
-                }
-                else if (midiMessage.pitch==midiNote2)
-                {
-                     usert.sounds[usert.currentSound].time2.push_back(tempTime); 
-                }
-                tempTime = 0;           
-            }
+
+	// clean up
+	//midiIn.closePort();
+	//midiIn.removeListener(this);
+
     }
 }
 
 //--------------------------------------------------------------
+/*
+void testApp::newMidiMessage(ofxMidiMessage& msg) {
+
+	// make a copy of the latest message
+	midiMessage = msg;
+}
+*/
+
+//--------------------------------------------------------------
 void testApp::keyPressed(int key) {
-    
+    cout << "In keypress function" <<endl;
+    cout << key << endl;
     password += key;
-    
-    switch (key) {
-        case ' ':
-            //add time stamp to the transcription vector
-            if ((tapWithSpace) && (beats.getIsPlaying()))  
-                usert.sounds[usert.currentSound].time1.push_back( beats.getPositionMS() ); 
-            break;
-        case 9:
-            //add time stamp to the transcription vector
-            if ((tapWithTab) && (beats.getIsPlaying()))  
-                usert.sounds[usert.currentSound].time2.push_back( beats.getPositionMS() ); 
-            break;
-        case 1:
-            //OF_EXIT_APP(0); 
-            //cout << "1 pressed " << endl;
-            break; 
-        case 26:
-            //OF_EXIT_APP(0); 
-            //cout << "q pressed " << endl;
-            break; 
-        case 113:
-            //OF_EXIT_APP(0); 
-            //cout << "z pressed " << endl;
-            break;        
-        case OF_KEY_ESC:
-            //cout << "esc pressed " << endl;
-            //OF_EXIT_APP(0); 
-            break;
-        default:
-            break;
+    if(key==codeKeySpace){
+        if ((tapWithSpace) && (beats.getIsPlaying()))
+                usert.sounds[usert.currentSound].time1.push_back( beats.getPositionMS());
+                cout << "SpaceCodekeyPressed " << endl;
+    }
+    else if(key==codeKeyTab){
+        if ((tapWithTab) && (beats.getIsPlaying()))
+                usert.sounds[usert.currentSound].time2.push_back( beats.getPositionMS());
+                cout << "TabCodekeyPressed " << endl;
+    }
+    else {
+        cout << "OtherKeyPressed" << endl;
+        switch (key) {
+            /*
+            case codeKeySpace:
+                //add time stamp to the transcription vector
+                if ((tapWithSpace) && (beats.getIsPlaying()))
+                    usert.sounds[usert.currentSound].time1.push_back( beats.getPositionMS() );
+                break;
+            case codeKeyTab:
+                //add time stamp to the transcription vector
+                if ((tapWithTab) && (beats.getIsPlaying()))
+                    usert.sounds[usert.currentSound].time2.push_back( beats.getPositionMS() );
+                break;
+            */
+            case 1:
+                //OF_EXIT_APP(0);
+                //cout << "1 pressed " << endl;
+                break;
+            case 26:
+                //OF_EXIT_APP(0);
+                //cout << "q pressed " << endl;
+                break;
+            case 113:
+                //OF_EXIT_APP(0);
+                //cout << "z pressed " << endl;
+                break;
+            case OF_KEY_ESC:
+                //cout << "esc pressed " << endl;
+                //OF_EXIT_APP(0);
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -860,27 +896,27 @@ void testApp::mouseReleased() {
 
 void testApp::guiEvent1(ofxUIEventArgs &e)
 {
-    int wkind = e.widget->getKind(); 
+    int wkind = e.widget->getKind();
     string wname = e.widget->getName();
-    ofxUIButton *button = (ofxUIButton *) e.widget;    
-    
+    ofxUIButton *button = (ofxUIButton *) e.widget;
+
     //START TEST
-	if ((wname == "START") && (button->getValue()==1))	
-    {       
+	if ((wname == "START") && (button->getValue()==1))
+    {
         ofxUILabel *errors = (ofxUILabel*) gui1->getWidget("ERRORS");
-        
+
         //GATHER USER DATA AND CHECK IT
-        ofxUITextInput *uName = (ofxUITextInput *) gui1->getWidget("ID");        
-        string name = ofToLower(uName->getTextString()); 
+        ofxUITextInput *uName = (ofxUITextInput *) gui1->getWidget("ID");
+        string name = ofToLower(uName->getTextString());
         uName->setTextString("");
         tempName = "";
-        
+
         //remove trailing and leading spaces
         name.erase(name.begin(), std::find_if(name.begin(), name.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
         name.erase(std::find_if(name.rbegin(), name.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), name.end());
-        
+
         //check log-in errors
-        if (newUser) 
+        if (newUser)
         {
             //check semantic errors
             if (name.length() < 2)
@@ -889,7 +925,7 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
                 errors->setVisible(TRUE);
             }
             else
-            {    
+            {
                 vector<string> names = ofSplitString(name, " ");
                 text.clear();text.str("");
                 if (names.size()>1) text << names[0].substr(0,1) << names[1].substr(0,1);
@@ -897,27 +933,27 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
                 tempName = text.str();
                 tempFullName = name;
                 tempDate = ofGetTimestampString();
-                
+
                 //fromStart = TRUE;
-                //if(isClient) sendToServer = TRUE;  
+                //if(isClient) sendToServer = TRUE;
                 toggleInstructions1 = FALSE;
                 toggleInstructions11 = FALSE;
                 toggleScore = FALSE;
-                
+
                 //comment these three lines if you wanna use quiz
-                fromStart = TRUE;
-                if(isClient) sendToServer = TRUE;
-                
+                //fromStart = TRUE;
+                //if(isClient) sendToServer = TRUE;
+
                 //use this instead if you wanna use quiz
-                //gui2->enable();
+                gui2->enable();
                 gui1->disable();
-                gui3->enable();
-                
-            }    
-            
+                //gui3->enable();
+
+            }
+
         }
         else //existing user
-        {    
+        {
             //check semantic errors
             if (name.length() < 3)
             {
@@ -931,19 +967,19 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
                 if(isClient) sendToServer = TRUE;
             }
         }
-    }  
-    
-    //SCORE TABLE
-	if ((wname == "SCORES") && (button->getValue()==1))	
-    {  
-        getScoreTable();
-        toggleScore = !toggleScore; 
     }
-    
+
+    //SCORE TABLE
+	if ((wname == "SCORES") && (button->getValue()==1))
+    {
+        getScoreTable();
+        toggleScore = !toggleScore;
+    }
+
     //CHANGE NEW/EXISTING
     else if(wkind == OFX_UI_WIDGET_TOGGLE)
     {
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget; 
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         ofxUILabel *label = (ofxUILabel *) gui1->getWidget("NAME");
         if ((wname == "NEW") && (toggle->getValue() == 1)) {
             newUser = TRUE;
@@ -952,31 +988,31 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
         else if ((wname == "EXISTING") && (toggle->getValue() == 1)) {
             newUser = FALSE;
             label->setLabel("ID");
-        }          
+        }
     }
-    
+
 }
 
 //use this too if you wanna use quiz
-/*
+
 void testApp::guiEvent2(ofxUIEventArgs &e)
 {
-    int wkind = e.widget->getKind(); 
+    int wkind = e.widget->getKind();
     string wname = e.widget->getName();
-    ofxUIButton *button = (ofxUIButton *) e.widget;    
-    
-	if ((wname == "NEXT") && (button->getValue()==1))	
-    {  
+    ofxUIButton *button = (ofxUIButton *) e.widget;
+
+	if ((wname == "NEXT") && (button->getValue()==1))
+    {
         ofxUILabel *errors = (ofxUILabel*) gui2->getWidget("ERRORS");
         bool nextStep = TRUE;
         //GATHER USER DATA AND CHECK IT
-        ofxUITextInput *uAge = (ofxUITextInput *) gui2->getWidget("AGEN");    
+        ofxUITextInput *uAge = (ofxUITextInput *) gui2->getWidget("AGEN");
         ofxUITextInput *uYears = (ofxUITextInput *) gui2->getWidget("YEARS");
         tempAge = 0;
         tempMF = 0;
         tempYears = 0;
         tempFam = 0;
-        
+
         if ((uYears->getTextString().length() < 1) || (!is_number(uYears->getTextString())))
         {
             errors->setLabel("ERROR! PLEASE ENTER THE YEARS OF MUSICAL TRAINING AGAIN");
@@ -985,7 +1021,7 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
             uYears->setTextString("");
         }
         else tempYears = ofToInt(uYears->getTextString());
-        
+
         if  ((uAge->getTextString().length() < 1) || (!is_number(uAge->getTextString())))
         {
             errors->setLabel("ERROR! PLEASE ENTER YOUR AGE AGAIN");
@@ -993,155 +1029,167 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
             nextStep = FALSE;
             uAge->setTextString("");
         }
-        else tempAge = ofToInt(uAge->getTextString()); 
-        
+        else tempAge = ofToInt(uAge->getTextString());
+
         if (nextStep)
         {
-            ofxUIRadio *radios = (ofxUIRadio *) gui2->getWidget("GENDER"); 
-            ofxUIRadio *radiof = (ofxUIRadio *) gui2->getWidget("FAMILIARITY WITH TURKISH MUSIC");            
+            ofxUIRadio *radios = (ofxUIRadio *) gui2->getWidget("GENDER");
+            ofxUIRadio *radiof = (ofxUIRadio *) gui2->getWidget("FAMILIARITY WITH TURKISH MUSIC");
             ofxUIToggle * toggles = radios->getActive();
             ofxUIToggle * togglef = radiof->getActive();
             tempMF = toggles->getValue();
             tempFam = togglef->getValue();
             uAge->setTextString("");
             uYears->setTextString("");
-            
+
             //save the data or send it to server
             fromStart = TRUE;
-            if(isClient) sendToServer = TRUE;            
+            if(isClient) sendToServer = TRUE;
         }
-        
+
     }
 }
-*/
 
 void testApp::guiEvent3(ofxUIEventArgs &e)
 {
-    int wkind = e.widget->getKind(); 
+    int wkind = e.widget->getKind();
     string wname = e.widget->getName();
-    ofxUIButton *button = (ofxUIButton *) e.widget;    
-    
+    ofxUIButton *button = (ofxUIButton *) e.widget;
+
     //START TEST
-	if ((wname == "START") && (button->getValue()==1))	
-    {  
+	if ((wname == "START") && (button->getValue()==1))
+    {
         //LOAD TAPPING INTERFACE
-        loadTapping(1);  
+        loadTapping(1);
     }
 
 }
 
-
+// Please change to add Image XaX
 void testApp::guiEvent4(ofxUIEventArgs &e)
-{  
+{
     ofxUIButton *button = (ofxUIButton *) e.widget;
-    
+
     //play a song
-	if ((e.widget->getName() == "PLAYF") && (button->getValue()==1))	
-    {         
+	if ((e.widget->getName() == "PLAYF") && (button->getValue()==1))
+    {
         if (!beats.isLoaded()) { cout << "sound failed to load" << endl; }
-        else if ((!beats.getIsPlaying()) && (played<noPlays)) 
+        else if ((!beats.getIsPlaying()) && (played<noPlays))
         {
             //update playing widget
             ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui4->getWidget("%");
             rotary->setValue(0.0);
-            
+
             //clear transcription vector for the current sound
             tempTime = 0;
             usert.sounds[usert.currentSound].time1.clear();
             usert.sounds[usert.currentSound].time2.clear();
-            usert.sounds[usert.currentSound].tryNo = played+1;  
-            //beats.play();    
+            usert.sounds[usert.currentSound].tryNo = played+1;
+            //beats.play();
             play = TRUE;
         }
         if (!beats.getIsPlaying())  played++;
-    }   
-    
+    }
+
     //next song
-    if ((e.widget->getName() == "NEXTF") && (button->getValue()==1))	
-    {             
+    if ((e.widget->getName() == "NEXTF") && (button->getValue()==1))
+    {
         if (beats.getIsPlaying()) {return;} //everything is inactive when sound is playing
         else if ((usert.currentSound == (numSounds-1)) && (played>0)) //move to the results stage
-        {  
-            usert.currentSound++;            
-            
+        {
+            usert.currentSound++;
+
             //save the tapping to xml
             text.clear();text.str("");
             text << "data/" << usert.getName() << ".xml";
-            saveXmlTap(text.str());   
-            
+            saveXmlTap(text.str());
+
             //compute and load results
-            if (launchScript) 
+            if (launchScript)
             {
                 //ofResetElapsedTimeCounter();
-                ofxUILabel *errors1 = (ofxUILabel*) gui4->getWidget("PLEASE WAIT...");
-                ofxUILabel *errors2 = (ofxUILabel*) gui5->getWidget("PLEASE WAIT...");
+                ofxUILabel *ferrors1 = (ofxUILabel*) gui4->getWidget("PLEASE WAIT...");
+                ofxUILabel *ferrors2 = (ofxUILabel*) gui5->getWidget("PLEASE WAIT...");
                 ofxUIButton *finish = (ofxUIButton*) gui5->getWidget("FINISH");
                 finish->setVisible(FALSE);
-                errors1->setVisible(TRUE);
-                errors2->setVisible(TRUE);
+                ferrors1->setVisible(TRUE);
+                ferrors2->setVisible(TRUE);
                 callScript();
                 askResults = TRUE;
             }
-            
+
             //load gui
             toggleInstructions1 = FALSE;
             toggleScore = FALSE;
             toggleInstructions11 = FALSE;
             toggleInstructions3 = FALSE;
+            toggleTalaDesc = TRUE;
             gui4->disable();
             gui5->enable();
             button->setValue(FALSE);
-            
+
             //update the play button label
             ofxUILabel* playl = (ofxUILabel *) gui4->getWidget("PLAY AGAIN");
             playl->setLabel("PLAY");
             played = 0;
         }
         else if (played>0) //move to the next sound if the current sound has been played
-        {      
+        {
             //save the tapping to xml
             text.clear();text.str("");
             text << "data/" << usert.getName() << ".xml";
-            saveXmlTap(text.str()); 
-            
+            saveXmlTap(text.str());
+
             usert.currentSound++;
-            
+
             if (usert.currentSound > 0) {toggleInstructions1 = FALSE;toggleInstructions11 = FALSE;toggleScore = FALSE;}
-            
-            //load the next sound     
-            beats.loadSound(songNames[usert.sounds[usert.currentSound].songID]);            
+
+            //load the next sound
+            cout << "Unloading sound..." << endl;
+            beats.unloadSound();
+            beats.loadSound(songNames[usert.sounds[usert.currentSound].songID]);
+            cout << "Loaded sound..." << endl;
             beats.setMultiPlay(false);
             played = 0;
-            
+
             //change song number label
             char numstr[21]; // enough to hold all numbers up to 64-bits
             sprintf(numstr, "%d", usert.currentSound+1);
             string label1 = "SONG ID: ", label2 = label1 + numstr;
             ofxUILabel *songN = (ofxUILabel *) gui4->getWidget("SONG ID");
             songN->setLabel(label2);
-            
+
             //update playing widget at zero
             ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui4->getWidget("%");
             rotary->setValue(0.0);
-            
+
             //update the play button label
             ofxUILabel* playl = (ofxUILabel *) gui4->getWidget("PLAY AGAIN");
-            playl->setLabel("PLAY");            
-            
-        }        
+            playl->setLabel("PLAY");
+
+            //change this XaX
+            //load the next image
+            img4->clear();
+            img4->loadImage(descImgNames[usert.sounds[usert.currentSound].songID]);
+            ofBuffer bufferTala = ofBufferFromFile(descTxtNames[usert.sounds[usert.currentSound].songID]); // reading tala Instructions
+            cout << talaInstr << endl;
+            if (bufferTala.size()>0) talaInstr = bufferTala.getText();
+            else talaInstr = "";
+            talaDesc->setLabel(talaInstr);
+        }
     }
-    
+
     //quit tapping to the log-in
-	if ((e.widget->getName() == "QUIT") && (button->getValue()==1))	
-    { 
+	if ((e.widget->getName() == "QUIT") && (button->getValue()==1))
+    {
         //if (beats.getIsPlaying()) {return;} //everything is inactive when sound is playing
-        //else 
+        //else
         //{
             if (usert.currentSound > -1)
             {
                 if (usert.sounds[usert.currentSound].time1.size()<1)
                 {
-                    usert.currentSound--;                      
+                    usert.currentSound--;
                 }
                 else
                 {
@@ -1151,35 +1199,36 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
                     saveXmlTap(text.str());
                 }
             }
-            
+
             //stop the audio
             if (beats.getIsPlaying()) beats.stop();
-            
+
             //update the play button label
             ofxUILabel* playl = (ofxUILabel *) gui4->getWidget("PLAY AGAIN");
             playl->setLabel("PLAY");
-        
+
             if (usert.currentSound + 1 >= minTaps) //we move to the results
             {
                 //compute and load results
-                if (launchScript) 
+                if (launchScript)
                 {
                     //ofResetElapsedTimeCounter();
-                    ofxUILabel *errors1 = (ofxUILabel*) gui4->getWidget("PLEASE WAIT...");
-                    ofxUILabel *errors2 = (ofxUILabel*) gui5->getWidget("PLEASE WAIT...");
+                    ofxUILabel *ferrors1 = (ofxUILabel*) gui4->getWidget("PLEASE WAIT...");
+                    ofxUILabel *ferrors2 = (ofxUILabel*) gui5->getWidget("PLEASE WAIT...");
                     ofxUIButton *finish = (ofxUIButton*) gui5->getWidget("FINISH");
                     finish->setVisible(FALSE);
-                    errors1->setVisible(TRUE);
-                    errors2->setVisible(TRUE);
+                    ferrors1->setVisible(TRUE);
+                    ferrors2->setVisible(TRUE);
                     callScript();
                     askResults = TRUE;
                 }
-                
+
                 //load gui
                 toggleInstructions1 = FALSE;
                 toggleInstructions11 = FALSE;
                 toggleInstructions3 = FALSE;
                 toggleScore = FALSE;
+                toggleTalaDesc = true;
                 gui4->disable();
                 gui5->enable();
                 button->setValue(FALSE);
@@ -1187,53 +1236,54 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
             }
             else //we move the beggining
             {
-                //load the gui1     
+                //load the gui1
                 toggleInstructions1 = TRUE;
                 toggleInstructions11 = TRUE;
                 toggleInstructions3 = FALSE;
                 button->setValue(FALSE);
                 ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
-                radio->activateToggle("NEW"); 
+                radio->activateToggle("NEW");
                 newUser = TRUE;
                 ofxUILabel *label = (ofxUILabel *) gui1->getWidget("NAME");
                 label->setLabel("NAME");
+                toggleTalaDesc = True;
                 gui4->disable();
                 gui1->enable();
-                
-                
+
+
                 //clear the data
                 usert.setName("");
                 usert.setID(-1);
                 usert.currentSound = -1;
                 usert.deleteTranscription();
                 played = 0;
-                
+
             }
-            
-            
-           
+
+
+
             //if (matlabScript.isThreadRunning()) matlabScript.stop();
         //}
     }
-    
-    if ((e.widget->getName() == "INSTRUCTIONS") && (button->getValue()==1))	
-    {     
+
+    if ((e.widget->getName() == "INSTRUCTIONS") && (button->getValue()==1))
+    {
         //show/hide the instructions
-        toggleInstructions3 = !toggleInstructions3;        
+        toggleInstructions3 = !toggleInstructions3;
     }
-    
+
 }
 
 
 void testApp::guiEvent5(ofxUIEventArgs &e)
-{    
-    ofxUIButton *button = (ofxUIButton *) e.widget;    
-    
+{
+    ofxUIButton *button = (ofxUIButton *) e.widget;
+
     //finish
-    if ((e.widget->getName() == "FINISH") && (button->getValue()==1))	
-    { 
+    if ((e.widget->getName() == "FINISH") && (button->getValue()==1))
+    {
         matlabScript.stop();
-        
+
         //we move go the beggining
         //clear the data
         usert.setName("");
@@ -1243,45 +1293,45 @@ void testApp::guiEvent5(ofxUIEventArgs &e)
         usert.currentSound = -1;
         usert.deleteTranscription();
         played = 0;
-        
+
         //syncronize data
-        //loadXmlUser("data/users.xml");              
-        
-        //load the gui1     
+        //loadXmlUser("data/users.xml");
+
+        //load the gui1
         toggleInstructions1 = TRUE;
         toggleInstructions11 = TRUE;
         toggleInstructions3 = FALSE;
         button->setValue(FALSE);
         ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
-        radio->activateToggle("NEW"); 
+        radio->activateToggle("NEW");
         newUser = TRUE;
         ofxUILabel *label = (ofxUILabel *) gui1->getWidget("NAME");
         label->setLabel("NAME");
         toggleResults = FALSE;
         gui5->disable();
-        gui1->enable();  
+        gui1->enable();
     }
-    
+
 }
 
 void testApp::loadTapping(int stage)
 {
     //if the user tapped everything before we just present him the results
     if (usert.currentSound >= numSounds)
-    {   
+    {
         //compute and load results
-        if (launchScript) 
+        if (launchScript)
         {
             askResults = TRUE;
         }
-        
+
         //ADD WIDGETS
         //user
         text.clear();text.str("");
         text << "PLEASE REMEMBER YOUR USER ID: " << usert.getName() << " ";
         ofxUILabel *userL1 = (ofxUILabel *) gui5->getWidget("ID");
         userL1->setLabel(text.str());
-        
+
         //load gui
         gui1->disable();
         gui5->enable();
@@ -1291,13 +1341,14 @@ void testApp::loadTapping(int stage)
         toggleInstructions3 = FALSE;
         toggleScore = FALSE;
     }
-    else 
+    else
     {
         //LOAD THE FIRST SOUND
+        beats.unloadSound();
         beats.loadSound(songNames[usert.sounds[usert.currentSound].songID]);
-        beats.setMultiPlay(false); 
+        beats.setMultiPlay(false);
         beats.setVolume(75);
-        
+
         //ADD WIDGETS
         //user
         text.clear();text.str("");
@@ -1306,33 +1357,44 @@ void testApp::loadTapping(int stage)
         userL->setLabel(text.str());
         ofxUILabel *userL1 = (ofxUILabel *) gui5->getWidget("ID");
         userL1->setLabel(text.str());
-        
+
         //song nr
         text.clear();text.str("");
         text << "SONG ID: " << usert.currentSound+1 << " ";
         ofxUILabel *songN = (ofxUILabel *) gui4->getWidget("SONG ID");
-        songN->setLabel(text.str());              
-        
+        songN->setLabel(text.str());
+
         ofxUILabel *errors = (ofxUILabel*) gui1->getWidget("ERRORS");
-        errors->setVisible(FALSE);            
-        
+        errors->setVisible(FALSE);
+
         //ofxUIButton *button = (ofxUIButton *) e.widget;
         //button->setValue(FALSE);
         ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui4->getWidget("%");
-        rotary->setValue(0.0);        
+        rotary->setValue(0.0);
         ofxUISlider *volume = (ofxUISlider *) gui4->getWidget("VOL");
         volume->setValue(75);
-        
+
+        //change this for the image XaX
+        //load the first image
+        img4->clear();
+        img4->loadImage(descImgNames[usert.sounds[usert.currentSound].songID]);
+        ofBuffer bufferTala = ofBufferFromFile(descTxtNames[usert.sounds[usert.currentSound].songID]); // reading tala Instructions
+        cout << talaInstr << endl;
+        if (bufferTala.size()>0) talaInstr = bufferTala.getText();
+        else talaInstr = "";
+        talaDesc->setLabel(talaInstr);
+
         //load the gui
-        if (stage==0)   gui1->disable();    
-        else    gui3->disable();    
+        if (stage==0)   gui1->disable();
+        else    gui3->disable();
         toggleInstructions1 = FALSE;
         toggleInstructions11 = FALSE;
         toggleInstructions2 = FALSE;
         toggleInstructions3 = FALSE;
         toggleScore = FALSE;
-        gui4->enable(); 
-        
+        toggleTalaDesc = TRUE;
+        gui4->enable();
+
         played = 0;
     }
 }
@@ -1341,23 +1403,26 @@ void testApp::loadTapping(int stage)
 void testApp::loadXmlSettings(string fileName)
 {
     //save user to the xml file
-    ofxXmlSettings xmlSet;    
+    ofxXmlSettings xmlSet;
     if(xmlSet.loadFile(fileName))
-    {        
+    {
         if (xmlSet.tagExists("settings"))
-        {   
-            xmlSet.pushTag("settings");           
+        {
+            xmlSet.pushTag("settings");
             //load settings
             passToExit =  xmlSet.getValue("passToExit", "exit");
             if (xmlSet.getValue("verbose", 1)) verbose = TRUE;
             else verbose = FALSE;
             if (xmlSet.getValue("fullscreen", 1)) fullscreen = TRUE;
             else fullscreen = FALSE;
+            if (xmlSet.getValue("useMidi", 1)) useMidi = TRUE;
+            else useMidi = FALSE;
             fps = xmlSet.getValue("fps", 1000);
             midiPort = xmlSet.getValue("midiPort", 0);
             midiChannel = xmlSet.getValue("midiChannel", 10);
-            midiNote = xmlSet.getValue("midiNote", 36); 
-            midiNote2 = xmlSet.getValue("midiNote2", 38); 
+            codeKeyTab = xmlSet.getValue("codeKeyTab", 9);
+            codeKeySpace = xmlSet.getValue("codeKeySpace", 32);
+            midiNote = xmlSet.getValue("midiNote", 46);
             noPlays = xmlSet.getValue("noPlays", 2);
             minTaps = xmlSet.getValue("minTaps", 1);
             if (xmlSet.getValue("randomFiles", 1)) randomFiles = TRUE;
@@ -1377,17 +1442,17 @@ void testApp::loadXmlSettings(string fileName)
             else isClient = FALSE;
             tcpPort = xmlSet.getValue("tcpPort", 9001);
             ipServer = xmlSet.getValue("ipServer", "127.0.0.1");;
-            
-            xmlSet.popTag();  
+
+            xmlSet.popTag();
         }
         else {
             verbose = FALSE;
             fullscreen = TRUE;
+            useMidi = FALSE;
             fps = 1000;
             midiPort = 0;
             midiChannel = 10;
-            midiNote = 36;
-            midiNote2 = 38;
+            midiNote = 46;
             noPlays = 2;
             minTaps = 1;
             randomFiles = TRUE;
@@ -1402,11 +1467,14 @@ void testApp::loadXmlSettings(string fileName)
             tcpPort = 9001;
             ipServer = "127.0.0.1";
             passToExit = "exit";
+            codeKeyTab = 9;
+            codeKeySpace = 32;
         }
     }
     else {
         verbose = FALSE;
         fullscreen = TRUE;
+        useMidi = FALSE;
         fps = 1000;
         midiPort = 0;
         midiChannel = 10;
@@ -1425,8 +1493,10 @@ void testApp::loadXmlSettings(string fileName)
         tcpPort = 9001;
         ipServer = "127.0.0.1";
         passToExit = "exit";
+        codeKeyTab = 9;
+        codeKeySpace = 32;
     }
-    
+
 }
 
 
@@ -1440,31 +1510,31 @@ void testApp::saveXmlUser(string fileName)
     ofxXmlSettings xmlUser;
     xmlUser.addTag( "users" );
     xmlUser.pushTag( "users" );
-    
+
     xmlUser.setValue("records", nrUsers);
     xmlUser.setValue("maxID", maxID);
-    
+
     //add all the existing users
     for(int i = 0; i < nrUsers; i++){
         //each position tag represents one user
         xmlUser.addTag( "user" );
         xmlUser.pushTag( "user" , i);
-        //set the values 
+        //set the values
         xmlUser.setValue("ID", uIDs[i]);
         xmlUser.setValue("name", uNames[i]);
         xmlUser.setValue("fullname", uFullNames[i]);
         xmlUser.setValue("date", uDate[i]);
         //use this too if you wanna use quiz
-        //xmlUser.setValue("age", uAge[i]);
-        //xmlUser.setValue("gender", uMF[i]);
-        //xmlUser.setValue("experience", uYears[i]);
-        //xmlUser.setValue("familiarity", uFam[i]);
-        xmlUser.popTag();//pop position        
-    } 
-    
+        xmlUser.setValue("age", uAge[i]);
+        xmlUser.setValue("gender", uMF[i]);
+        xmlUser.setValue("experience", uYears[i]);
+        xmlUser.setValue("familiarity", uFam[i]);
+        xmlUser.popTag();//pop position
+    }
+
     xmlUser.popTag();
     xmlUser.saveFile( fileName );
-    
+
 }
 
 
@@ -1473,35 +1543,35 @@ void testApp::loadXmlUser(string fileName)
     //users.clear();
     //load all users from the xml file into the users vector
     ofxXmlSettings xmlUser;
-    
+
     if(xmlUser.loadFile(fileName))
     {
-        
+
         if (xmlUser.tagExists("users"))
         {
             xmlUser.pushTag("users");
-            
+
             if (nrUsers<1) //when entering the program we have to add all users stored
             {
                 //get records from the xml
-                nrUsers = xmlUser.getNumTags("user"); 
+                nrUsers = xmlUser.getNumTags("user");
                 maxID=-1;
                 for(int i = 0; i < nrUsers; i++){
-                    xmlUser.pushTag("user", i);            
+                    xmlUser.pushTag("user", i);
                     uIDs.push_back(xmlUser.getValue("ID", 0));
                     uNames.push_back(xmlUser.getValue("name", ""));
                     uFullNames.push_back(xmlUser.getValue("fullname", ""));
                     uDate.push_back(xmlUser.getValue("date", ""));
                     //use this too if you wanna use quiz
-                    //uAge.push_back(xmlUser.getValue("age", 0));
-                    //uMF.push_back(xmlUser.getValue("gender", 0));
-                    //uYears.push_back(xmlUser.getValue("experience", 0));
-                    //uFam.push_back(xmlUser.getValue("familiarity", 0));
-                    xmlUser.popTag();                        
-                    if (maxID<uIDs[i]) maxID=uIDs[i]; 
-                }      
+                    uAge.push_back(xmlUser.getValue("age", 0));
+                    uMF.push_back(xmlUser.getValue("gender", 0));
+                    uYears.push_back(xmlUser.getValue("experience", 0));
+                    uFam.push_back(xmlUser.getValue("familiarity", 0));
+                    xmlUser.popTag();
+                    if (maxID<uIDs[i]) maxID=uIDs[i];
+                }
             }
-            
+
             xmlUser.popTag(); //pop position
         }
         else
@@ -1516,7 +1586,7 @@ void testApp::loadXmlUser(string fileName)
         maxID = -1;
         nrUsers = 0;
     }
-    
+
 }
 
 
@@ -1526,19 +1596,19 @@ void testApp::saveXmlTap(string fileName)
     //save user to the xml file
     ofxXmlSettings xmlTap;
     int nrRec;
-    
+
     xmlTap.addTag( "tapping" );
     xmlTap.addAttribute("tapping","userID", usert.getID(),0);
     xmlTap.addAttribute("tapping","currentSound", usert.currentSound,0);
     xmlTap.pushTag( "tapping" );
-    
-    //add random indexes 
+
+    //add random indexes
     text.clear();text.str("");
     for(int i = 0; i < numSounds; i++){
         text << usert.sounds[i].songID << " ";
     }
     xmlTap.setValue("songIndexes",text.str().c_str());
-    
+
     if (usert.currentSound >= numSounds) nrRec=numSounds; else nrRec=usert.currentSound+1;
     for(int i = 0; i < nrRec; i++){
         //each position tag represents one user
@@ -1546,10 +1616,10 @@ void testApp::saveXmlTap(string fileName)
         xmlTap.addAttribute("song","songID", usert.sounds[i].songID,i);
         xmlTap.addAttribute("song","tryNo", usert.sounds[i].tryNo,i);
         xmlTap.pushTag( "song" , i);
-        
-        //set the values 
+
+        //set the values
         xmlTap.setValue("fileName",songNames[usert.sounds[i].songID]);
-        
+
         //write the time stamps in a string
         std::vector<int>::const_iterator it;
         text.clear();text.str("");
@@ -1565,63 +1635,63 @@ void testApp::saveXmlTap(string fileName)
             text << *it << " ";
         }
         xmlTap.setValue("transcription2", text.str().c_str());
-        
-        xmlTap.popTag();//pop position        
-    } 
-    
+
+        xmlTap.popTag();//pop position
+    }
+
     xmlTap.popTag();
     xmlTap.saveFile( fileName );
-    
+
 }
 
 
 void testApp::loadXmlTap(string fileName)
 {
     //save user to the xml file
-    ofxXmlSettings xmlTap;    
-    
+    ofxXmlSettings xmlTap;
+
     if(xmlTap.loadFile(fileName))
-    {        
+    {
         if (xmlTap.tagExists("tapping"))
-        {   
-            //cout << usert.getID() << " " << 
+        {
+            //cout << usert.getID() << " " <<
             if (usert.getID() != xmlTap.getAttribute("tapping", "userID", 0, 0)) usert.currentSound=0;
-            else 
+            else
             {
                 xmlTap.pushTag("tapping");
                 usert.currentSound = xmlTap.getNumTags("song");
                 //usert.currentSound=xmlTap.getAttribute("tapping", "currentSound", 0); //or xmlTap.getNumTags("song")
-                
+
                 string transcript="";
                 int t;
-                for(int i = 0; i < xmlTap.getNumTags("song"); i++){     
-                    usert.sounds[i].songID = xmlTap.getAttribute("song", "songID", i,  i);   
-                    usert.sounds[i].tryNo = xmlTap.getAttribute("song", "tryNo", 1, i);  
+                for(int i = 0; i < xmlTap.getNumTags("song"); i++){
+                    usert.sounds[i].songID = xmlTap.getAttribute("song", "songID", i,  i);
+                    usert.sounds[i].tryNo = xmlTap.getAttribute("song", "tryNo", 1, i);
                     //xmlTap.getValue("filename", "");
-                    
+
                     xmlTap.pushTag("song", i);
                     //load transcription
-                    transcript = xmlTap.getValue("transcription", "");      
+                    transcript = xmlTap.getValue("transcription", "");
                     text.clear();text.str("");
                     text << transcript;
-                    while (text >> t)                        
+                    while (text >> t)
                         usert.sounds[i].time1.push_back(t);
-                    
-                    transcript = xmlTap.getValue("transcription2", "");      
+
+                    transcript = xmlTap.getValue("transcription2", "");
                     text.clear();text.str("");
                     text << transcript;
-                    while (text >> t)                        
+                    while (text >> t)
                         usert.sounds[i].time2.push_back(t);
-                    
-                    xmlTap.popTag();            
-                }  
+
+                    xmlTap.popTag();
+                }
             }
-            
+
         }
         else usert.currentSound=0;
     }
     else usert.currentSound=0;
-    
+
 }
 
 
@@ -1631,13 +1701,13 @@ int testApp::checkUser(string initials)
     int code=0;
     int nameID=0;
     for(int i = 0; i < nrUsers; i++)
-    {       
+    {
         if (uNames[i].substr(0,2) == initials)
         {
             text.clear();text.str("");
             text << uNames[i].substr(2,uNames[i].length()-2);
-            text >> nameID; 
-            if (nameID > code) code = nameID;           
+            text >> nameID;
+            if (nameID > code) code = nameID;
         }
     }
     code++;
@@ -1649,8 +1719,8 @@ int testApp::checkUser(string initials)
 int testApp::getUserID(string uName)
 {
     int code=-1;
-    
-    //cout << uName << endl; 
+
+    //cout << uName << endl;
     for(int i = 0; i < nrUsers; i++)
     {
         if (uNames[i] == uName) code = uIDs[i];
@@ -1683,47 +1753,47 @@ void testApp::callScript()
 //load the results from the xml
 void testApp::loadXmlResults()
 {
-    
+
     //WAIT FOR MATLAB SCRIPT TO END
-    matlabScript.waitForThread(); 
-    
+    matlabScript.waitForThread();
+
     //ofSleepMillis(2 * 1000);
     float score=0.0;
     int numTapped = 0;
-    
+
     if (usert.currentSound >= numSounds) numTapped = numSounds;
     else numTapped = usert.currentSound + 1;
     text.clear();text.str("");
     text <<  "data/" << usert.getName() << "out.xml";
     //parse xml
-    
-    ofxXmlSettings xmlTap;    
-    
+
+    ofxXmlSettings xmlTap;
+
     if(xmlTap.loadFile(text.str()))
-    {        
+    {
         if (xmlTap.tagExists("results"))
-        {  
+        {
             xmlTap.pushTag("results");
             //load results
-            score = xmlTap.getValue("OverallMean", 0.0);            
-            xmlTap.popTag();  
+            score = xmlTap.getValue("OverallMean", 0.0);
+            xmlTap.popTag();
         }
-        
+
     }
-    
+
     insertScore(usert.getID(), usert.getName(), score, numTapped);
     std::sort(highscores.begin(), highscores.end(), compareByLength);
-    
+
     text.clear();text.str("");
-    text << "Your tapping score is " << score << ". <> You have tapped " << numTapped << " songs.";    
+    text << "Your tapping score is " << score << ". <> You have tapped " << numTapped << " songs.";
     text << " <> Your position in the highscore table is " << findName(usert.getID())+1 << "." ;
     if (numTapped < numSounds) text << " <> You can improve your score by resuming tapping at a later time.";
     else text << " <> You tapped all the songs.";
     //needs to be replaced with the actual results
     results.setText(text.str());
-    results.wrapTextX(ofGetHeight()-OFX_UI_GLOBAL_WIDGET_SPACING);     
+    results.wrapTextX(ofGetHeight()-OFX_UI_GLOBAL_WIDGET_SPACING);
     results.setColor(240, 240, 240, 180);
-    
+
 }
 
 //-------UTILS
@@ -1735,7 +1805,7 @@ void testApp::randomOrder(int uid)
     srand(uid);//unique random order for each user
     int* deck = new int[numSounds];
     for(int i = 0; i < numSounds; i++)  deck[i] = i+1;
-    
+
     if (randomFiles)
     {
         while (i > 1) {
@@ -1746,10 +1816,10 @@ void testApp::randomOrder(int uid)
             deck[k] = t;
         }
     }
-    
-    for(int i = 0; i < numSounds; i++){ 
+
+    for(int i = 0; i < numSounds; i++){
         usert.sounds[i].songID = deck[i]-1;
-    }  
+    }
     delete[] deck;
 }
 
@@ -1774,7 +1844,7 @@ int testApp::findName(int idToFind)
 }
 
 void testApp::insertScore (int u, string i, float s, int n)
-{ 
+{
     int exists = findName(u);
     if (exists > -1)
     {
@@ -1792,7 +1862,7 @@ void testApp::insertScore (int u, string i, float s, int n)
         uscore.noTapped = n;
         highscores.push_back(uscore);
     }
-}  
+}
 
 void testApp::saveXmlScores(string fileName)
 {
@@ -1800,87 +1870,87 @@ void testApp::saveXmlScores(string fileName)
     ofxXmlSettings xmlUser;
     xmlUser.addTag( "scores" );
     xmlUser.pushTag( "scores" );
-    
+
     //add all the existing users
     for(int i = 0; i < highscores.size(); i++){
         //each position tag represents one user
         xmlUser.addTag( "user" );
         xmlUser.pushTag( "user" , i);
-        //set the values 
+        //set the values
         xmlUser.setValue("id", highscores[i].uid);
         xmlUser.setValue("name", highscores[i].name);
         xmlUser.setValue("score", highscores[i].score);
         xmlUser.setValue("noTapped", highscores[i].noTapped);
-        xmlUser.popTag();//pop position        
-    } 
-    
+        xmlUser.popTag();//pop position
+    }
+
     xmlUser.popTag();
     xmlUser.saveFile( fileName );
-    
+
 }
 
 
 void testApp::loadXmlScores(string fileName)
 {
     ofxXmlSettings xmlUser;
-    
+
     if(xmlUser.loadFile(fileName))
     {
-        
+
         if (xmlUser.tagExists("scores"))
         {
             xmlUser.pushTag("scores");
-            
-            if (xmlUser.getNumTags("user")>0) 
+
+            if (xmlUser.getNumTags("user")>0)
             {
                 //get records from the xml
                 for(int i = 0; i < xmlUser.getNumTags("user"); i++){
-                    xmlUser.pushTag("user", i);            
+                    xmlUser.pushTag("user", i);
                     insertScore(xmlUser.getValue("id",0), xmlUser.getValue("name", ""), xmlUser.getValue("score",0.0), xmlUser.getValue("noTapped", 0));
-                    xmlUser.popTag();                        
-                }      
+                    xmlUser.popTag();
+                }
                 std::sort(highscores.begin(), highscores.end(), compareByLength);
             }
-            
+
             xmlUser.popTag(); //pop position
         }
     }
-    
+
 }
 
 void testApp::getScoreTable()
 {
     vector<string> tid, tname, tscore , ntoTapped;
     tid.push_back(" <> <> HIGHSCORES <> <> NO."); tname.push_back(" <> <> <> <> ID"); tscore.push_back(" <> <> <> <> SCORE"); ntoTapped.push_back(" <> <> <> <> TAPPED");
-    
+
     int max;
     if (highscores.size() > 10) max = 10;
     else max = highscores.size();
     for(int i = 0; i < highscores.size(); i++){
         tid.push_back(ofToString(i+1));
-        tname.push_back(highscores[i].name); 
-        tscore.push_back(ofToString(floor(highscores[i].score*100)/100)); 
+        tname.push_back(highscores[i].name);
+        tscore.push_back(ofToString(floor(highscores[i].score*100)/100));
         ntoTapped.push_back(ofToString(highscores[i].noTapped));
     }
-    
+
     scoreTable1.init("GUI/newmediafett.ttf", 12);
     scoreTable1.setText(ofJoinString(tid, " <> "));
-    scoreTable1.wrapTextX(6*itemDimGUI);     
-    scoreTable1.setColor(240, 240, 240, 180); 
-    
+    scoreTable1.wrapTextX(6*itemDimGUI);
+    scoreTable1.setColor(240, 240, 240, 180);
+
     scoreTable2.init("GUI/newmediafett.ttf", 12);
     scoreTable2.setText(ofJoinString(tname, " <> "));
-    scoreTable2.wrapTextX(15*itemDimGUI);     
+    scoreTable2.wrapTextX(15*itemDimGUI);
     scoreTable2.setColor(240, 240, 240, 180);
-    
+
     scoreTable3.init("GUI/newmediafett.ttf", 12);
     scoreTable3.setText(ofJoinString(tscore, " <> "));
-    scoreTable3.wrapTextX(15*itemDimGUI);     
+    scoreTable3.wrapTextX(15*itemDimGUI);
     scoreTable3.setColor(240, 240, 240, 180);
-    
+
     scoreTable4.init("GUI/newmediafett.ttf", 12);
     scoreTable4.setText(ofJoinString(ntoTapped, " <> "));
-    scoreTable4.wrapTextX(6*itemDimGUI);     
+    scoreTable4.wrapTextX(6*itemDimGUI);
     scoreTable4.setColor(240, 240, 240, 180);
-    
+
 }

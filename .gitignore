@@ -2,7 +2,8 @@
 *.slo
 *.lo
 *.o
-
+*.wav
+*.mp3
 # Compiled Dynamic libraries
 *.so
 
