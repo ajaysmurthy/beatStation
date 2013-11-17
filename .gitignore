@@ -4,6 +4,7 @@
 *.o
 *.wav
 *.mp3
+*.png
 # Compiled Dynamic libraries
 *.so
 
