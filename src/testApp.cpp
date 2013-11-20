@@ -76,9 +76,11 @@ void testApp::setup() {
     /////////// INITIALIZE GUI SETTINGS
     float dim = itemDimGUI;
     float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
-    float length = ofGetHeight()-xInit;
+    float length = ofGetWidth()/3.0-xInit;
     vector<string> names;
-
+    float GUI_xpos = ofGetWidth()*1.0/6.0;
+    float GUI_ypos = ofGetHeight()*1.0/6.0;
+    cout  << "Length = " << length << endl;
 
     //LOAD INSTRUCTIONS
     toggleInstructions1 = TRUE;
@@ -123,14 +125,14 @@ void testApp::setup() {
     //copyleft
     copyleft.init("GUI/newmediafett.ttf", 12);
     copyleft.setText(instrGUI1);
-    copyleft.setText("Copyright (c) 2012 by INESC TEC: Marius Miron, Andre Holzapfel, Matthew Davies, Fabien Gouyon. This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/3.0/. <> <> This work is partly-funded by the ERDF - European Regional Development Fund through the COMPETE Programme (operational programme for competitiveness) and by National Funds through the FCT - Fundacao para a Ciencia e a Tecnologia (Portuguese Foundation for Science and Technology) within project PTDC/EAT-MMU/112255/2009-(FCOM-01-0124-FEDER-014732)");
+    copyleft.setText("Welcome to the <> <> Based on BeatStation by Marius Miron. ");
     //copyleft.setText("text");
-    copyleft.wrapTextX(1.6*length);
+    copyleft.wrapTextX(length);
     copyleft.setColor(240, 240, 240, 180);
 
 
     //GUI USER
-    gui1 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());		//ofxUICanvas(float x, float y, float width, float height)
+    gui1 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());		//ofxUICanvas(float x, float y, float width, float height)
     gui1->addWidgetDown(new ofxUILabel("BEAT STATION", OFX_UI_FONT_LARGE));
     ofxUISpacer* spaceri = new ofxUISpacer(1.1*length, 2, "SPACER");
     gui1->addWidgetDown(spaceri);
@@ -158,21 +160,32 @@ void testApp::setup() {
 
     //use this too if you wanna use quiz
     //GUI QUIZ
-    gui2 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
+    gui2 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());
     gui2->disable();
-    gui2->addWidgetDown(new ofxUILabel("QUESTIONS", OFX_UI_FONT_LARGE));
-    gui2->addSpacer(1.3*length, 2);
+    gui2->addWidgetDown(new ofxUILabel("Please answer these questions", OFX_UI_FONT_LARGE));
+    gui2->addSpacer(length, 2);
 
     gui2->addWidgetDown(new ofxUILabel("AGE", OFX_UI_FONT_MEDIUM));
-    gui2->addWidgetSouthOf(new ofxUITextInput("AGEN", "", (length-xInit)/10),"AGE");
-    vector<string> vs; vs.push_back("MALE"); vs.push_back("FEMALE");
-    ofxUIRadio *radios = (ofxUIRadio *) gui2->addWidgetSouthOf(new ofxUIRadio("GENDER", vs, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ),"AGEN");
-    radios->activateToggle("MALE");
-    gui2->addWidgetDown(new ofxUILabel("YEARS OF MUSICAL TRAINING", OFX_UI_FONT_MEDIUM));
-    gui2->addWidgetDown(new ofxUITextInput("YEARS", "", (length-xInit)/10));
-    vector<string> vy; vy.push_back("LOW"); vy.push_back("MEDIUM"); vy.push_back("HIGH");
-    ofxUIRadio *radioy = (ofxUIRadio *) gui2->addWidgetDown(new ofxUIRadio("FAMILIARITY WITH TURKISH MUSIC", vy, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ));
-    radioy->activateToggle("LOW");
+    gui2->addWidgetSouthOf(new ofxUITextInput("AGEN", "", (length-xInit)/8),"AGE");
+    vector<string> vs; vs.push_back("FEMALE"); vs.push_back("MALE");
+    radios = (ofxUIRadio *) gui2->addWidgetSouthOf(new ofxUIRadio("GENDER", vs, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ),"AGEN");
+    radios->activateToggle("FEMALE");
+    // Music Training
+    //gui2->addWidgetDown(new ofxUILabel("YEARS OF MUSICAL TRAINING", OFX_UI_FONT_MEDIUM));
+    //gui2->addWidgetDown(new ofxUITextInput("YEARS", "", (length-xInit)/10));
+    vector<string> vtrain; vtrain.push_back("NONE"); vtrain.push_back("0-2 YEARS"); vtrain.push_back("2-5 YEARS"); vtrain.push_back("5-10 YEARS"); vtrain.push_back("MORE THAN 10 YEARS");
+    radioTrain = (ofxUIRadio *) gui2->addWidgetDown(new ofxUIRadio("YEARS OF MUSICAL TRAINING", vtrain, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ));
+    // Music Training in Carnatic Music
+    //gui2->addWidgetDown(new ofxUILabel("YEARS OF MUSICAL TRAINING IN CARNATIC MUSIC", OFX_UI_FONT_MEDIUM));
+    vector<string> vtrainCarnatic; vtrainCarnatic.push_back("NONE"); vtrainCarnatic.push_back("0-2 YEARS"); vtrainCarnatic.push_back("2-5 YEARS"); vtrainCarnatic.push_back("5-10 YEARS"); vtrainCarnatic.push_back("MORE THAN 10 YEARS");
+    radioTrainCarnatic = (ofxUIRadio *) gui2->addWidgetDown(new ofxUIRadio("YEARS OF MUSICAL TRAINING IN CARNATIC MUSIC", vtrainCarnatic, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ));
+
+    vector<string> vfam; vfam.push_back("UNFAMILIAR"); vfam.push_back("ACQUAINTED"); vfam.push_back("OCCASIONAL LISTENER"); vfam.push_back("REGULAR LISTENER"); vfam.push_back("PERFORMING MUSICIAN"); vfam.push_back("PROFESSIONAL MUSICIAN");
+    //vector<string> vfam; vfam.push_back("UNFAMILIAR"); vfam.push_back("A"); vfam.push_back("B"); vfam.push_back("C"); vfam.push_back("D"); vfam.push_back("E");
+    radiofam = (ofxUIRadio *) gui2->addWidgetDown(new ofxUIRadio("FAMILIARITY AND EXPERIENCE WITH CARNATIC MUSIC", vfam, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ));
+    radioTrain->activateToggle("NONE");
+    radioTrainCarnatic->activateToggle("NONE");
+    radiofam->activateToggle("UNFAMILIAR");
     gui2->setDrawBack(false);
     gui2->addWidgetDown(new ofxUIButton("NEXT",false, dim*2, dim*2, OFX_UI_FONT_MEDIUM));
     ofxUILabel *errors1 = (ofxUILabel*) new ofxUILabel("ERRORS", OFX_UI_FONT_MEDIUM);
@@ -189,7 +202,7 @@ void testApp::setup() {
     ofAddListener(gui2->newGUIEvent, this, &testApp::guiEvent2);
 
     //GUI PRE-TEST
-    gui3 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
+    gui3 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());
     gui3->disable();
     gui3->addWidgetDown(new ofxUILabel("INSTRUCTIONS", OFX_UI_FONT_LARGE));
     gui3->addSpacer(1.1*length, 2);
@@ -213,7 +226,7 @@ void testApp::setup() {
 
 
     //GUI TEST
-    gui4 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
+    gui4 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());
     gui4->disable();
     gui4->addWidgetDown(new ofxUILabel("BEAT STATION", OFX_UI_FONT_LARGE));
     ofxUISpacer* sp401 = new ofxUISpacer(1.1*length, 2, "SPACER401");
@@ -265,7 +278,7 @@ void testApp::setup() {
     gui4->setDrawBack(false);
 
     //GUI RESULTS
-    gui5 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
+    gui5 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());
     gui5->disable();
     gui5->addWidgetDown(new ofxUILabel("THANK YOU!", OFX_UI_FONT_LARGE));
     gui5->addSpacer(1.1*length, 2);
@@ -464,7 +477,8 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                         uAge.push_back(ofToInt(tokens[2]));
                         uMF.push_back(ofToInt(tokens[3]));
                         uYears.push_back(ofToInt(tokens[4]));
-                        uFam.push_back(ofToInt(tokens[5]));
+                        uYearsCarnatic.push_back(ofToInt(tokens[5]));
+                        uFam.push_back(ofToInt(tokens[6]));
                     }
                     else
                     {
@@ -503,9 +517,8 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                     //what we need to send
                     text.clear();text.str("");
                     //use this instead if you wanna use quiz
-                    text << newUser << "<&>" << tempName << "<&>" << tempAge << "<&>" << tempMF << "<&>" << tempYears << "<&>" << tempFam << "<&>";
+                    text << newUser << "<&>" << tempName << "<&>" << tempAge << "<&>" << tempMF << "<&>" << tempYears << "<&>" << tempYearsCarnatic << "<&>" << tempFam << "<&>";
                     //text << newUser << "<&>" << tempName << "<&>" << tempFullName << "<&>" << tempDate << "<&>";
-
                     if(tcpClient.send(text.str()))
                     {
                         //ok we manage to send it so we can exit the loop
@@ -612,14 +625,16 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                 uAge.push_back(tempAge);
                 uMF.push_back(tempMF);
                 uYears.push_back(tempYears);
+                uYearsCarnatic.push_back(tempYearsCarnatic);
                 uFam.push_back(tempFam);
 
                 //initialize the current user
                 code = maxID;
                 tempName = text.str();
-
+                cout << "Came here to server..." <<endl;
                 //save all the existing users!
                 saveXmlUser("data/users.xml");
+                cout << "Saved to file" <<endl;
             }
             //get the max id with the existing user with same initials
             else code = getUserID(tempName);
@@ -821,21 +836,21 @@ void testApp::newMidiMessage(ofxMidiMessage& msg) {
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key) {
-    cout << "In keypress function" <<endl;
-    cout << key << endl;
+    //cout << "In keypress function" <<endl;
+    //cout << key << endl;
     password += key;
     if(key==codeKeySpace){
         if ((tapWithSpace) && (beats.getIsPlaying()))
                 usert.sounds[usert.currentSound].time1.push_back( beats.getPositionMS());
-                cout << "SpaceCodekeyPressed " << endl;
+                //cout << "SpaceCodekeyPressed " << endl;
     }
     else if(key==codeKeyTab){
         if ((tapWithTab) && (beats.getIsPlaying()))
                 usert.sounds[usert.currentSound].time2.push_back( beats.getPositionMS());
-                cout << "TabCodekeyPressed " << endl;
+                //cout << "TabCodekeyPressed " << endl;
     }
     else {
-        cout << "OtherKeyPressed" << endl;
+        //cout << "OtherKeyPressed" << endl;
         switch (key) {
             /*
             case codeKeySpace:
@@ -1007,12 +1022,13 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
         bool nextStep = TRUE;
         //GATHER USER DATA AND CHECK IT
         ofxUITextInput *uAge = (ofxUITextInput *) gui2->getWidget("AGEN");
-        ofxUITextInput *uYears = (ofxUITextInput *) gui2->getWidget("YEARS");
+        //ofxUITextInput *uYears = (ofxUITextInput *) gui2->getWidget("YEARS");
         tempAge = 0;
         tempMF = 0;
         tempYears = 0;
+        tempYearsCarnatic = 0;
         tempFam = 0;
-
+        /*
         if ((uYears->getTextString().length() < 1) || (!is_number(uYears->getTextString())))
         {
             errors->setLabel("ERROR! PLEASE ENTER THE YEARS OF MUSICAL TRAINING AGAIN");
@@ -1021,7 +1037,7 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
             uYears->setTextString("");
         }
         else tempYears = ofToInt(uYears->getTextString());
-
+        */
         if  ((uAge->getTextString().length() < 1) || (!is_number(uAge->getTextString())))
         {
             errors->setLabel("ERROR! PLEASE ENTER YOUR AGE AGAIN");
@@ -1033,18 +1049,34 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
 
         if (nextStep)
         {
-            ofxUIRadio *radios = (ofxUIRadio *) gui2->getWidget("GENDER");
-            ofxUIRadio *radiof = (ofxUIRadio *) gui2->getWidget("FAMILIARITY WITH TURKISH MUSIC");
-            ofxUIToggle * toggles = radios->getActive();
-            ofxUIToggle * togglef = radiof->getActive();
-            tempMF = toggles->getValue();
-            tempFam = togglef->getValue();
+            cout << "You are now collecting data" << endl;
+            //ofxUIRadio *radios = (ofxUIRadio *) gui2->getWidget("GENDER");
+            //ofxUIRadio *radiotrain = (ofxUIRadio *) gui2->getWidget("YEARS OF MUSICAL TRAINING");
+            //ofxUIRadio *radiotrainCarnatic = (ofxUIRadio *) gui2->getWidget("YEARS OF MUSICAL TRAINING IN CARNATIC MUSIC");
+            //ofxUIRadio *radiofam = (ofxUIRadio *) gui2->getWidget("FAMILIARITY WITH CARNATIC MUSIC");
+
+            //ofxUIToggle * toggles = radios->getActive();
+            //ofxUIToggle * toggletrain = radioTrain->getActive();
+            //ofxUIToggle * toggletrainCarnatic = radioTrainCarnatic->getActive();
+            //ofxUIToggle * toggleFam = radiofam->getActive();
+
+            //tempMF = toggles->getValue();
+            //tempYears = toggletrain->getValue();
+            //tempYearsCarnatic = toggletrainCarnatic->getValue();
+            //tempFam = toggleFam->getValue();
+            tempMF = radios->getActiveToggleIndex();
+            tempYears = radioTrain->getActiveToggleIndex();
+            tempYearsCarnatic = radioTrainCarnatic->getActiveToggleIndex();
+            tempFam = radiofam->getActiveToggleIndex();
             uAge->setTextString("");
-            uYears->setTextString("");
+            cout << tempAge << " " << tempMF << " " << tempYears << " " << tempYearsCarnatic << " " << tempFam << endl;
+            //uYears->setTextString("");
 
             //save the data or send it to server
             fromStart = TRUE;
-            if(isClient) sendToServer = TRUE;
+            if(isClient){
+                sendToServer = TRUE;
+            }
         }
 
     }
@@ -1065,7 +1097,7 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
 
 }
 
-// Please change to add Image XaX
+
 void testApp::guiEvent4(ofxUIEventArgs &e)
 {
     ofxUIButton *button = (ofxUIButton *) e.widget;
@@ -1506,6 +1538,7 @@ void testApp::loadXmlSettings(string fileName)
 ///USER LIST SAVE/LOAD
 void testApp::saveXmlUser(string fileName)
 {
+    cout << "In the saveXmlUser" << endl;
     //save user to the xml file
     ofxXmlSettings xmlUser;
     xmlUser.addTag( "users" );
@@ -1513,9 +1546,10 @@ void testApp::saveXmlUser(string fileName)
 
     xmlUser.setValue("records", nrUsers);
     xmlUser.setValue("maxID", maxID);
-
+    cout << nrUsers << endl;
     //add all the existing users
     for(int i = 0; i < nrUsers; i++){
+        cout << "Inside the loop..." << endl;
         //each position tag represents one user
         xmlUser.addTag( "user" );
         xmlUser.pushTag( "user" , i);
@@ -1526,10 +1560,16 @@ void testApp::saveXmlUser(string fileName)
         xmlUser.setValue("date", uDate[i]);
         //use this too if you wanna use quiz
         xmlUser.setValue("age", uAge[i]);
+        cout << "End of the loop..." << endl;
         xmlUser.setValue("gender", uMF[i]);
         xmlUser.setValue("experience", uYears[i]);
+        cout << " EXP in the loop..." << endl;
+        xmlUser.setValue("experienceCarnatic", uYearsCarnatic[i]);
+        cout << " EXPCAR in the loop..." << endl;
         xmlUser.setValue("familiarity", uFam[i]);
+        cout << " EXPFAM in the loop..." << endl;
         xmlUser.popTag();//pop position
+        cout << "End of the loop..." << endl;
     }
 
     xmlUser.popTag();
@@ -1566,6 +1606,7 @@ void testApp::loadXmlUser(string fileName)
                     uAge.push_back(xmlUser.getValue("age", 0));
                     uMF.push_back(xmlUser.getValue("gender", 0));
                     uYears.push_back(xmlUser.getValue("experience", 0));
+                    uYears.push_back(xmlUser.getValue("experienceCarnatic", 0));
                     uFam.push_back(xmlUser.getValue("familiarity", 0));
                     xmlUser.popTag();
                     if (maxID<uIDs[i]) maxID=uIDs[i];

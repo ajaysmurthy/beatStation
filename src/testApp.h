@@ -92,6 +92,10 @@ public:
     ofImage* img4;
     ofxUIImage* guimg4;
     ofxUILabel *talaDesc;
+    ofxUIRadio *radios;
+    ofxUIRadio *radioTrain;
+    ofxUIRadio *radioTrainCarnatic;
+    ofxUIRadio *radiofam;
 
     void guiEvent1(ofxUIEventArgs &e);
     void guiEvent2(ofxUIEventArgs &e);
@@ -110,6 +114,7 @@ public:
     vector<int>uMF;
     vector<int>uAge;
     vector<int>uYears;
+    vector<int>uYearsCarnatic;
     vector<int>uFam;
     string tempName;
     string tempFullName;
@@ -117,6 +122,7 @@ public:
     int tempAge;
     int tempMF;
     int tempYears;
+    int tempYearsCarnatic;
     int tempFam;
     bool newUser;
     bool fromStart;
