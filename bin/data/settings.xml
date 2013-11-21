@@ -11,7 +11,7 @@
     <randomFiles>1</randomFiles>
     <tapWithSpace>1</tapWithSpace>
     <tapWithTab>1</tapWithTab>
-    <codeKeySpace>107</codeKeySpace>
+    <codeKeySpace>32</codeKeySpace>
     <codeKeyTab>115</codeKeyTab>
     <canQuit>1</canQuit>
     <testType>1</testType>
