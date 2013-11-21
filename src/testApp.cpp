@@ -1,5 +1,4 @@
 #include "testApp.h"
-
 //--------------------------------------------------------------
 void testApp::setup() {
 
@@ -11,7 +10,6 @@ void testApp::setup() {
     //ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetEscapeQuitsApp(FALSE);
     if (fullscreen) ofSetFullscreen(1);
-
 
     //LOAD USERS
     nrUsers = 0;
@@ -89,12 +87,18 @@ void testApp::setup() {
     toggleInstructions3 = FALSE;
     toggleResults = FALSE;
     toggleScore = FALSE;
-    toggleTalaDesc = TRUE;
 
-    ofBuffer buffer = ofBufferFromFile("instructions.txt"); // reading into the buffer
-    if (buffer.size()>0) instrGUI2 = buffer.getText();
-    else instrGUI2 = "";
-    buffer = ofBufferFromFile("description.txt"); // reading into the buffer
+    if(testType){
+        ofBuffer buffer = ofBufferFromFile("instructions_test2.txt"); // reading into the buffer
+        if (buffer.size()>0) instrGUI2 = buffer.getText();
+        else instrGUI2 = "";
+    }
+    else{
+        ofBuffer buffer = ofBufferFromFile("instructions_test1.txt"); // reading into the buffer
+        if (buffer.size()>0) instrGUI2 = buffer.getText();
+        else instrGUI2 = "";
+    }
+    ofBuffer buffer = ofBufferFromFile("description.txt"); // reading into the buffer
     if (buffer.size()>0) instrGUI11 = buffer.getText();
     else instrGUI11 = "";
     instrGUI1 = "If you are new user enter your name and click START. <> If you are a returning user please click EXISTING and enter your ID, then click START.";
@@ -104,7 +108,7 @@ void testApp::setup() {
     instructions1.setColor(240, 240, 240, 180);
     instructions11.init("GUI/newmediafett.ttf", 12);
     instructions11.setText(instrGUI11);
-    instructions11.wrapTextX(length);
+    instructions11.wrapTextX(length+40);
     instructions11.setColor(240, 240, 240, 180);
     instructions2.init("GUI/newmediafett.ttf", 12);
     instructions2.setText(instrGUI2);
@@ -125,7 +129,7 @@ void testApp::setup() {
     //copyleft
     copyleft.init("GUI/newmediafett.ttf", 12);
     copyleft.setText(instrGUI1);
-    copyleft.setText("Welcome to the <> <> Based on BeatStation by Marius Miron. ");
+    copyleft.setText("The Carnatic music beat station is based on BeatStation by Marius Miron.");
     //copyleft.setText("text");
     copyleft.wrapTextX(length);
     copyleft.setColor(240, 240, 240, 180);
@@ -133,7 +137,7 @@ void testApp::setup() {
 
     //GUI USER
     gui1 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());		//ofxUICanvas(float x, float y, float width, float height)
-    gui1->addWidgetDown(new ofxUILabel("BEAT STATION", OFX_UI_FONT_LARGE));
+    gui1->addWidgetDown(new ofxUILabel("CARNATIC MUSIC BEAT STATION", OFX_UI_FONT_LARGE));
     ofxUISpacer* spaceri = new ofxUISpacer(1.1*length, 2, "SPACER");
     gui1->addWidgetDown(spaceri);
 
@@ -154,6 +158,12 @@ void testApp::setup() {
     ofxUILabel *errors = (ofxUILabel*) new ofxUILabel("ERRORS", OFX_UI_FONT_SMALL);
     errors->setVisible(FALSE);
     gui1->addWidgetSouthOf(errors,"ID");
+    imgCC = new ofImage();
+    imgCC->loadImage("logos.png");
+    guimgCC = new ofxUIImage(20, ofGetHeight()/2, imgCC->width, imgCC->height, imgCC, "logos",false);
+    gui1->addWidget(guimgCC);
+    ofxUILabel *eventName = (ofxUILabel*) new ofxUILabel("3rd CompMusic Workshop, IIT Madras, India.", OFX_UI_FONT_MEDIUM);
+    gui1->addWidgetSouthOf(eventName,"logos");
     //gui1->centerWidgets();
     gui1->setDrawBack(false);
     //gui1->disable();
@@ -224,11 +234,10 @@ void testApp::setup() {
     sp->setVisible(FALSE);
     ofAddListener(gui3->newGUIEvent, this, &testApp::guiEvent3);
 
-
     //GUI TEST
     gui4 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());
     gui4->disable();
-    gui4->addWidgetDown(new ofxUILabel("BEAT STATION", OFX_UI_FONT_LARGE));
+    gui4->addWidgetDown(new ofxUILabel("CARNATIC MUSIC BEAT STATION", OFX_UI_FONT_LARGE));
     ofxUISpacer* sp401 = new ofxUISpacer(1.1*length, 2, "SPACER401");
     gui4->addWidgetDown(sp401);
 
@@ -265,13 +274,20 @@ void testApp::setup() {
     gui4->addWidgetEastOf(ferrors1,"QUIT");
     ofxUISpacer* sp4 = new ofxUISpacer(length, 2, "SPACER1");
     gui4->addWidgetEastOf(sp4, "SPACER401");
-    img4 = new ofImage();
-    img4->loadImage("screen.png");
-    guimg4 = new ofxUIImage(2*itemDimGUI + ofGetHeight()-length, 0, img4->width, img4->height, img4, "Tala Description",false);
-    gui4->addWidgetEastOf(guimg4, "SPACER401");
-    talaDesc = (ofxUILabel*) new ofxUILabel("talaDesc", OFX_UI_FONT_SMALL);
-    gui4->addWidgetNorthOf(talaDesc, "Tala Description");
-    talaDesc->setVisible(True);
+    //cout << "Image Dim (WxH): " << img4->width << " "<< img4->height << endl;
+    //guimg4 = new ofxUIImage(2*itemDimGUI + ofGetHeight()-length, 0, img4->width, img4->height, img4, "Tala Description",false);
+    if(testType){
+        img4 = new ofImage();
+        img4->loadImage("talaImage.png");
+        guimg4 = new ofxUIImage(0, 0, img4->width, img4->height, img4, "Tala Description",false);
+        gui4->addWidgetEastOf(guimg4, "SPACER401");
+        talaDesc = (ofxUILabel*) new ofxUILabel("talaDesc", OFX_UI_FONT_SMALL);
+        gui4->addWidgetNorthOf(talaDesc, "Tala Description");
+        imageInfo = (ofxUILabel*) new ofxUILabel("The sama are shown with 'x' and the beats are shown with numbers.", OFX_UI_FONT_SMALL);
+        gui4->addWidgetSouthOf(imageInfo, "Tala Description");
+        imageInfo->setVisible(True);
+        talaDesc->setVisible(True);
+    }
     sp4->setVisible(False);
     ofAddListener(gui4->newGUIEvent, this, &testApp::guiEvent4);
     //gui4->centerWidgets();
@@ -280,7 +296,7 @@ void testApp::setup() {
     //GUI RESULTS
     gui5 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());
     gui5->disable();
-    gui5->addWidgetDown(new ofxUILabel("THANK YOU!", OFX_UI_FONT_LARGE));
+    gui5->addWidgetDown(new ofxUILabel("THANK YOU! You have finished tapping all the excerpts.", OFX_UI_FONT_LARGE));
     gui5->addSpacer(1.1*length, 2);
     ofxUILabel* id3 = new ofxUILabel("ID", OFX_UI_FONT_MEDIUM);
     id3->setColorFill(black);
@@ -294,7 +310,6 @@ void testApp::setup() {
     spacer2->setVisible(FALSE);
     ofAddListener(gui5->newGUIEvent, this, &testApp::guiEvent5);
     gui5->setDrawBack(false);
-
 
 
     //TCP CLIENT SERVER
@@ -648,7 +663,7 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
             //now we check what we've got
             if (code == -1)
             {
-                errors1->setLabel("ERROR! THE USER WITH THIS ID DOESN'T EXIST IN THE DATABASE");
+                errors1->setLabel("ERROR! THE USER WITH THIS ID DOESN'T EXIST.");
                 errors1->setVisible(TRUE);
                 safeToStart = FALSE;
                 fromStart = FALSE;
@@ -1155,7 +1170,6 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
             toggleScore = FALSE;
             toggleInstructions11 = FALSE;
             toggleInstructions3 = FALSE;
-            toggleTalaDesc = TRUE;
             gui4->disable();
             gui5->enable();
             button->setValue(FALSE);
@@ -1201,13 +1215,15 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
 
             //change this XaX
             //load the next image
-            img4->clear();
-            img4->loadImage(descImgNames[usert.sounds[usert.currentSound].songID]);
-            ofBuffer bufferTala = ofBufferFromFile(descTxtNames[usert.sounds[usert.currentSound].songID]); // reading tala Instructions
-            cout << talaInstr << endl;
-            if (bufferTala.size()>0) talaInstr = bufferTala.getText();
-            else talaInstr = "";
-            talaDesc->setLabel(talaInstr);
+            if(testType){
+                img4->clear();
+                img4->loadImage(descImgNames[usert.sounds[usert.currentSound].songID]);
+                ofBuffer bufferTala = ofBufferFromFile(descTxtNames[usert.sounds[usert.currentSound].songID]); // reading tala Instructions
+                cout << talaInstr << endl;
+                if (bufferTala.size()>0) talaInstr = bufferTala.getText();
+                else talaInstr = "";
+                talaDesc->setLabel(talaInstr);
+            }
         }
     }
 
@@ -1260,7 +1276,6 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
                 toggleInstructions11 = FALSE;
                 toggleInstructions3 = FALSE;
                 toggleScore = FALSE;
-                toggleTalaDesc = true;
                 gui4->disable();
                 gui5->enable();
                 button->setValue(FALSE);
@@ -1278,7 +1293,6 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
                 newUser = TRUE;
                 ofxUILabel *label = (ofxUILabel *) gui1->getWidget("NAME");
                 label->setLabel("NAME");
-                toggleTalaDesc = True;
                 gui4->disable();
                 gui1->enable();
 
@@ -1316,7 +1330,7 @@ void testApp::guiEvent5(ofxUIEventArgs &e)
     {
         matlabScript.stop();
 
-        //we move go the beggining
+        //we move go the begining
         //clear the data
         usert.setName("");
         usert.setFullName("");
@@ -1408,13 +1422,15 @@ void testApp::loadTapping(int stage)
 
         //change this for the image XaX
         //load the first image
-        img4->clear();
-        img4->loadImage(descImgNames[usert.sounds[usert.currentSound].songID]);
-        ofBuffer bufferTala = ofBufferFromFile(descTxtNames[usert.sounds[usert.currentSound].songID]); // reading tala Instructions
-        cout << talaInstr << endl;
-        if (bufferTala.size()>0) talaInstr = bufferTala.getText();
-        else talaInstr = "";
-        talaDesc->setLabel(talaInstr);
+        if(testType){
+            img4->clear();
+            img4->loadImage(descImgNames[usert.sounds[usert.currentSound].songID]);
+            ofBuffer bufferTala = ofBufferFromFile(descTxtNames[usert.sounds[usert.currentSound].songID]); // reading tala Instructions
+            cout << talaInstr << endl;
+            if (bufferTala.size()>0) talaInstr = bufferTala.getText();
+            else talaInstr = "";
+            talaDesc->setLabel(talaInstr);
+        }
 
         //load the gui
         if (stage==0)   gui1->disable();
@@ -1424,7 +1440,6 @@ void testApp::loadTapping(int stage)
         toggleInstructions2 = FALSE;
         toggleInstructions3 = FALSE;
         toggleScore = FALSE;
-        toggleTalaDesc = TRUE;
         gui4->enable();
 
         played = 0;
@@ -1457,6 +1472,7 @@ void testApp::loadXmlSettings(string fileName)
             midiNote = xmlSet.getValue("midiNote", 46);
             noPlays = xmlSet.getValue("noPlays", 2);
             minTaps = xmlSet.getValue("minTaps", 1);
+            testType = xmlSet.getValue("testType", 0);
             if (xmlSet.getValue("randomFiles", 1)) randomFiles = TRUE;
             else randomFiles = FALSE;
             if (xmlSet.getValue("tapWithTab", 1)) tapWithTab = TRUE;

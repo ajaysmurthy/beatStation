@@ -14,6 +14,7 @@
     <codeKeySpace>107</codeKeySpace>
     <codeKeyTab>115</codeKeyTab>
     <canQuit>1</canQuit>
+    <testType>1</testType>
     <itemDimGUI>24</itemDimGUI>
     <launchScript>0</launchScript>
     <scriptDirectory>XML4MAT</scriptDirectory>

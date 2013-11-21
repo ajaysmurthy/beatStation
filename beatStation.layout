@@ -2,30 +2,33 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
 	<File name="../../../addons/ofxUI/src/ofxUICanvas.h" open="1" top="0" tabpos="6">
-		<Cursor position="46923" topLine="1412" />
+		<Cursor position="36043" topLine="1140" />
 	</File>
 	<File name="../../../addons/ofxUI/src/ofxUIDropDownList.h" open="0" top="0" tabpos="5">
 		<Cursor position="2239" topLine="47" />
 	</File>
-	<File name="../../../addons/ofxUI/src/ofxUIImage.h" open="1" top="0" tabpos="5">
-		<Cursor position="3914" topLine="102" />
+	<File name="../../../addons/ofxUI/src/ofxUIImage.h" open="0" top="0" tabpos="5">
+		<Cursor position="3914" topLine="96" />
 	</File>
-	<File name="../../../addons/ofxUI/src/ofxUIRadio.h" open="0" top="0" tabpos="3">
-		<Cursor position="5785" topLine="198" />
+	<File name="../../../addons/ofxUI/src/ofxUIRadio.h" open="1" top="0" tabpos="4">
+		<Cursor position="2792" topLine="58" />
 	</File>
-	<File name="../../../addons/ofxUI/src/ofxUIScrollableCanvas.h" open="1" top="0" tabpos="4">
-		<Cursor position="10868" topLine="366" />
+	<File name="../../../addons/ofxUI/src/ofxUIScrollableCanvas.h" open="1" top="0" tabpos="10">
+		<Cursor position="10167" topLine="344" />
+	</File>
+	<File name="../../../addons/ofxUI/src/ofxUIToggle.h" open="1" top="0" tabpos="5">
+		<Cursor position="5398" topLine="27" />
 	</File>
 	<File name="../../../addons/ofxUI/src/ofxUIWidgetWithLabel.h" open="0" top="0" tabpos="4">
 		<Cursor position="663" topLine="11" />
 	</File>
 	<File name="src/main.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="150" topLine="0" />
+		<Cursor position="319" topLine="0" />
 	</File>
 	<File name="src/testApp.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="51248" topLine="1372" />
+		<Cursor position="5552" topLine="150" />
 	</File>
 	<File name="src/testApp.h" open="1" top="0" tabpos="2">
-		<Cursor position="2131" topLine="77" />
+		<Cursor position="2142" topLine="78" />
 	</File>
 </CodeBlocks_layout_file>

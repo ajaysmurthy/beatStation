@@ -61,8 +61,8 @@ public:
     string talaInstr;
     ofxTextBlock instructions1, instructions11, instructions2, results, scoreTable1, scoreTable2, scoreTable3, scoreTable4, copyleft;
     bool toggleInstructions1, toggleInstructions11, toggleInstructions2,toggleInstructions3, toggleResults, toggleScore, toggleCopyleft;
-    bool toggleTalaDesc;
     stringstream text;
+    int testType;
 
     void loadXmlSettings(string fileName);
 
@@ -90,8 +90,11 @@ public:
     ofxUICanvas *gui1,*gui2,*gui3, *gui4, *gui5;
     ofImage* img;
     ofImage* img4;
+    ofImage* imgCC;
     ofxUIImage* guimg4;
+    ofxUIImage* guimgCC;
     ofxUILabel *talaDesc;
+    ofxUILabel *imageInfo;
     ofxUIRadio *radios;
     ofxUIRadio *radioTrain;
     ofxUIRadio *radioTrainCarnatic;
