@@ -1,6 +1,6 @@
 <settings>
     <passToExit>exit</passToExit>
-    <verbose>1</verbose>
+    <verbose>0</verbose>
     <fullscreen>0</fullscreen>
     <fps>1000</fps>
     <midiPort>0</midiPort>

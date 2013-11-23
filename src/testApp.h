@@ -62,6 +62,9 @@ public:
     ofxTextBlock instructions1, instructions11, instructions2, results, scoreTable1, scoreTable2, scoreTable3, scoreTable4, copyleft;
     bool toggleInstructions1, toggleInstructions11, toggleInstructions2,toggleInstructions3, toggleResults, toggleScore, toggleCopyleft;
     stringstream text;
+    stringstream expLabel;
+    stringstream expCarnaticLabel;
+
     int testType;
 
     void loadXmlSettings(string fileName);
@@ -96,9 +99,14 @@ public:
     ofxUILabel *talaDesc;
     ofxUILabel *imageInfo;
     ofxUIRadio *radios;
-    ofxUIRadio *radioTrain;
-    ofxUIRadio *radioTrainCarnatic;
+    //ofxUIRadio *radioTrain;
+    //ofxUIRadio *radioTrainCarnatic;
     ofxUIRadio *radiofam;
+    ofxUIBiLabelSlider *expSlider;
+    ofxUIBiLabelSlider *expSliderCarnatic;
+    ofxUILabel *expSliderVal;
+    ofxUILabel *expSliderValCarnatic;
+
 
     void guiEvent1(ofxUIEventArgs &e);
     void guiEvent2(ofxUIEventArgs &e);

@@ -1,4 +1,5 @@
 #include "testApp.h"
+#define MUSIC_EXP_MAX 10.0
 //--------------------------------------------------------------
 void testApp::setup() {
 
@@ -40,15 +41,16 @@ void testApp::setup() {
     descImgNames = new string[numSounds];
     descTxtNames = new string[numSounds];
     tempStr = new string[1];
+    if(verbose) cout << "Loading sounds and images..." << endl;
     for(int i = 0; i < numSounds; i++){
         songNames[i] = DIR.getPath(i);
         tempStr[0] = DIR.getName(i);
         int nameLen = tempStr[0].length();
         descImgNames[i] = IMAGEDIR + tempStr[0].substr(0,nameLen-4) + ".png";
         descTxtNames[i] = IMAGEDIR + tempStr[0].substr(0,nameLen-4) + ".txt";
-        cout << songNames[i] << endl;
-        cout << descTxtNames[i] << endl;
-        cout << descImgNames[i] << endl;
+        //cout << songNames[i] << endl;
+        //cout << descTxtNames[i] << endl;
+        //cout << descImgNames[i] << endl;
     }
     if (numSounds<2) {cout << "NO SOUNDS IN THE SOUND DIRECTORY!" << endl; exitApp();}
     play = FALSE;
@@ -78,7 +80,7 @@ void testApp::setup() {
     vector<string> names;
     float GUI_xpos = ofGetWidth()*1.0/6.0;
     float GUI_ypos = ofGetHeight()*1.0/6.0;
-    cout  << "Length = " << length << endl;
+    //cout  << "Length = " << length << endl;
 
     //LOAD INSTRUCTIONS
     toggleInstructions1 = TRUE;
@@ -181,26 +183,38 @@ void testApp::setup() {
     radios = (ofxUIRadio *) gui2->addWidgetSouthOf(new ofxUIRadio("GENDER", vs, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ),"AGEN");
     radios->activateToggle("FEMALE");
     // Music Training
-    //gui2->addWidgetDown(new ofxUILabel("YEARS OF MUSICAL TRAINING", OFX_UI_FONT_MEDIUM));
-    //gui2->addWidgetDown(new ofxUITextInput("YEARS", "", (length-xInit)/10));
-    vector<string> vtrain; vtrain.push_back("NONE"); vtrain.push_back("0-2 YEARS"); vtrain.push_back("2-5 YEARS"); vtrain.push_back("5-10 YEARS"); vtrain.push_back("MORE THAN 10 YEARS");
-    radioTrain = (ofxUIRadio *) gui2->addWidgetDown(new ofxUIRadio("YEARS OF MUSICAL TRAINING", vtrain, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ));
+    //vector<string> vtrain; vtrain.push_back("NONE"); vtrain.push_back("0-2 YEARS"); vtrain.push_back("2-5 YEARS"); vtrain.push_back("5-10 YEARS"); vtrain.push_back("MORE THAN 10 YEARS");
+    //radioTrain = (ofxUIRadio *) gui2->addWidgetDown(new ofxUIRadio("YEARS OF MUSICAL TRAINING", vtrain, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ));
+    gui2->addWidgetDown(new ofxUILabel(15,100,"YEARS OF MUSICAL TRAINING", OFX_UI_FONT_MEDIUM));
+    expSlider = new ofxUIBiLabelSlider(0, 0, length*1.2, dim, 0.0, MUSIC_EXP_MAX+2, 0.0, "EXP", "None", ">10 years", OFX_UI_FONT_SMALL);
+    gui2->addWidgetDown(expSlider);
+    expSliderVal = new ofxUILabel("VAL", OFX_UI_FONT_MEDIUM);
+    gui2->addWidgetEastOf(expSliderVal,"EXP");
+    expSliderVal->setLabel("None");
     // Music Training in Carnatic Music
     //gui2->addWidgetDown(new ofxUILabel("YEARS OF MUSICAL TRAINING IN CARNATIC MUSIC", OFX_UI_FONT_MEDIUM));
-    vector<string> vtrainCarnatic; vtrainCarnatic.push_back("NONE"); vtrainCarnatic.push_back("0-2 YEARS"); vtrainCarnatic.push_back("2-5 YEARS"); vtrainCarnatic.push_back("5-10 YEARS"); vtrainCarnatic.push_back("MORE THAN 10 YEARS");
-    radioTrainCarnatic = (ofxUIRadio *) gui2->addWidgetDown(new ofxUIRadio("YEARS OF MUSICAL TRAINING IN CARNATIC MUSIC", vtrainCarnatic, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ));
+    //vector<string> vtrainCarnatic; vtrainCarnatic.push_back("NONE"); vtrainCarnatic.push_back("0-2 YEARS"); vtrainCarnatic.push_back("2-5 YEARS"); vtrainCarnatic.push_back("5-10 YEARS"); vtrainCarnatic.push_back("MORE THAN 10 YEARS");
+    //radioTrainCarnatic = (ofxUIRadio *) gui2->addWidgetDown(new ofxUIRadio("YEARS OF MUSICAL TRAINING IN CARNATIC MUSIC", vtrainCarnatic, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ));
+    gui2->addWidgetSouthWithSpaceOf(new ofxUILabel(15,100,"YEARS OF MUSICAL TRAINING IN CARNATIC MUSIC", OFX_UI_FONT_MEDIUM), "EXP");
+    expSliderCarnatic = new ofxUIBiLabelSlider(0, 0, length*1.2, dim, 0.0, MUSIC_EXP_MAX+2, 0.0, "EXPCARNATIC", "None", ">10 years", OFX_UI_FONT_SMALL);
+
+    gui2->addWidgetSouthOf(expSliderCarnatic,"YEARS OF MUSICAL TRAINING IN CARNATIC MUSIC");
+    expSliderValCarnatic = new ofxUILabel("VALCARNATIC", OFX_UI_FONT_MEDIUM);
+    gui2->addWidgetEastOf(expSliderValCarnatic,"EXPCARNATIC");
+    expSliderValCarnatic->setLabel("None");
 
     vector<string> vfam; vfam.push_back("UNFAMILIAR"); vfam.push_back("ACQUAINTED"); vfam.push_back("OCCASIONAL LISTENER"); vfam.push_back("REGULAR LISTENER"); vfam.push_back("PERFORMING MUSICIAN"); vfam.push_back("PROFESSIONAL MUSICIAN");
     //vector<string> vfam; vfam.push_back("UNFAMILIAR"); vfam.push_back("A"); vfam.push_back("B"); vfam.push_back("C"); vfam.push_back("D"); vfam.push_back("E");
-    radiofam = (ofxUIRadio *) gui2->addWidgetDown(new ofxUIRadio("FAMILIARITY AND EXPERIENCE WITH CARNATIC MUSIC", vfam, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ));
-    radioTrain->activateToggle("NONE");
-    radioTrainCarnatic->activateToggle("NONE");
+    radiofam = (ofxUIRadio *) gui2->addWidgetSouthWithSpaceOf(new ofxUIRadio("FAMILIARITY AND EXPERIENCE WITH CARNATIC MUSIC", vfam, OFX_UI_ORIENTATION_HORIZONTAL, dim, dim ),"EXPCARNATIC");
+    //radioTrain->activateToggle("NONE");
+    //radioTrainCarnatic->activateToggle("NONE");
     radiofam->activateToggle("UNFAMILIAR");
-    gui2->setDrawBack(false);
     gui2->addWidgetDown(new ofxUIButton("NEXT",false, dim*2, dim*2, OFX_UI_FONT_MEDIUM));
     ofxUILabel *errors1 = (ofxUILabel*) new ofxUILabel("ERRORS", OFX_UI_FONT_MEDIUM);
     errors1->setVisible(FALSE);
     gui2->addWidgetEastOf(errors1,"NEXT");
+    gui2->setDrawBack(false);
+
 
     //vector<string> vy; vy.push_back("LOW"); vy.push_back("MEDIUM"); vy.push_back("HIGH");
     /*
@@ -296,7 +310,7 @@ void testApp::setup() {
     //GUI RESULTS
     gui5 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());
     gui5->disable();
-    gui5->addWidgetDown(new ofxUILabel("THANK YOU! You have finished tapping all the excerpts.", OFX_UI_FONT_LARGE));
+    gui5->addWidgetDown(new ofxUILabel("THANK YOU!", OFX_UI_FONT_LARGE));
     gui5->addSpacer(1.1*length, 2);
     ofxUILabel* id3 = new ofxUILabel("ID", OFX_UI_FONT_MEDIUM);
     id3->setColorFill(black);
@@ -646,10 +660,9 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
                 //initialize the current user
                 code = maxID;
                 tempName = text.str();
-                cout << "Came here to server..." <<endl;
                 //save all the existing users!
                 saveXmlUser("data/users.xml");
-                cout << "Saved to file" <<endl;
+                if(verbose) cout << "Saved to users file" <<endl;
             }
             //get the max id with the existing user with same initials
             else code = getUserID(tempName);
@@ -734,7 +747,6 @@ void testApp::draw() {
 
     // update the sound playing system:
 	ofSoundUpdate();
-
 
     if (toggleInstructions1)
     {
@@ -951,7 +963,7 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
             //check semantic errors
             if (name.length() < 2)
             {
-                errors->setLabel("ERROR! PLEASE ENTER YOUR NAME AGAIN");
+                errors->setLabel("ERROR! PLEASE ENTER YOUR USERNAME AGAIN");
                 errors->setVisible(TRUE);
             }
             else
@@ -1030,7 +1042,38 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
     int wkind = e.widget->getKind();
     string wname = e.widget->getName();
     ofxUIButton *button = (ofxUIButton *) e.widget;
+    // Update the slider label values
+    float expVal = expSlider->getScaledValue();
+    float expValCar = expSliderCarnatic->getScaledValue();
+    expLabel.clear();expLabel.str("");
+    if(expVal > MUSIC_EXP_MAX+1){
+        expLabel << "More than " << MUSIC_EXP_MAX << " YEARS";
+    }
+    else if((int)expVal < 1){
+        expLabel << "None";
+    }
+    else if(expVal > 1 && expVal < 2){
+        expLabel << (int)expVal << " YEAR";
+    }
+    else {
+        expLabel << (int)expVal << " YEARS";
+    }
+    expSliderVal->setLabel(expLabel.str());
 
+    expCarnaticLabel.clear();expCarnaticLabel.str("");
+    if(expValCar > MUSIC_EXP_MAX+1){
+        expCarnaticLabel << "More than " << MUSIC_EXP_MAX << " YEARS";
+    }
+    else if((int)expValCar < 1){
+        expCarnaticLabel << "None";
+    }
+    else if(expValCar > 1 && expValCar < 2){
+        expCarnaticLabel << (int)expValCar << " YEAR";
+    }
+    else {
+        expCarnaticLabel << (int)expValCar << " YEARS";
+    }
+    expSliderValCarnatic->setLabel(expCarnaticLabel.str());
 	if ((wname == "NEXT") && (button->getValue()==1))
     {
         ofxUILabel *errors = (ofxUILabel*) gui2->getWidget("ERRORS");
@@ -1064,11 +1107,7 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
 
         if (nextStep)
         {
-            cout << "You are now collecting data" << endl;
-            //ofxUIRadio *radios = (ofxUIRadio *) gui2->getWidget("GENDER");
-            //ofxUIRadio *radiotrain = (ofxUIRadio *) gui2->getWidget("YEARS OF MUSICAL TRAINING");
-            //ofxUIRadio *radiotrainCarnatic = (ofxUIRadio *) gui2->getWidget("YEARS OF MUSICAL TRAINING IN CARNATIC MUSIC");
-            //ofxUIRadio *radiofam = (ofxUIRadio *) gui2->getWidget("FAMILIARITY WITH CARNATIC MUSIC");
+            //cout << "You are now collecting data" << endl;
 
             //ofxUIToggle * toggles = radios->getActive();
             //ofxUIToggle * toggletrain = radioTrain->getActive();
@@ -1076,15 +1115,15 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
             //ofxUIToggle * toggleFam = radiofam->getActive();
 
             //tempMF = toggles->getValue();
-            //tempYears = toggletrain->getValue();
-            //tempYearsCarnatic = toggletrainCarnatic->getValue();
             //tempFam = toggleFam->getValue();
             tempMF = radios->getActiveToggleIndex();
-            tempYears = radioTrain->getActiveToggleIndex();
-            tempYearsCarnatic = radioTrainCarnatic->getActiveToggleIndex();
+            //tempYears = radioTrain->getActiveToggleIndex();
+            //tempYearsCarnatic = radioTrainCarnatic->getActiveToggleIndex();
+            tempYears = (int)(expSlider->getScaledValue());
+            tempYearsCarnatic = (int)(expSliderCarnatic->getScaledValue());
             tempFam = radiofam->getActiveToggleIndex();
             uAge->setTextString("");
-            cout << tempAge << " " << tempMF << " " << tempYears << " " << tempYearsCarnatic << " " << tempFam << endl;
+            //cout << tempAge << " " << tempMF << " " << tempYears << " " << tempYearsCarnatic << " " << tempFam << endl;
             //uYears->setTextString("");
 
             //save the data or send it to server
@@ -1191,10 +1230,10 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
             if (usert.currentSound > 0) {toggleInstructions1 = FALSE;toggleInstructions11 = FALSE;toggleScore = FALSE;}
 
             //load the next sound
-            cout << "Unloading sound..." << endl;
+            if(verbose) cout << "Unloading sound..." << endl;
             beats.unloadSound();
             beats.loadSound(songNames[usert.sounds[usert.currentSound].songID]);
-            cout << "Loaded sound..." << endl;
+            if(verbose) cout << "Loaded sound..." << endl;
             beats.setMultiPlay(false);
             played = 0;
 
@@ -1219,7 +1258,7 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
                 img4->clear();
                 img4->loadImage(descImgNames[usert.sounds[usert.currentSound].songID]);
                 ofBuffer bufferTala = ofBufferFromFile(descTxtNames[usert.sounds[usert.currentSound].songID]); // reading tala Instructions
-                cout << talaInstr << endl;
+                //cout << talaInstr << endl;
                 if (bufferTala.size()>0) talaInstr = bufferTala.getText();
                 else talaInstr = "";
                 talaDesc->setLabel(talaInstr);
@@ -1257,6 +1296,7 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
 
             if (usert.currentSound + 1 >= minTaps) //we move to the results
             {
+                cout << "I am here" << endl;
                 //compute and load results
                 if (launchScript)
                 {
@@ -1338,6 +1378,11 @@ void testApp::guiEvent5(ofxUIEventArgs &e)
         usert.setID(-1);
         usert.currentSound = -1;
         usert.deleteTranscription();
+        expSlider->setValue(0.0);
+        expSliderCarnatic->setValue(0.0);
+        radiofam->activateToggle("UNFAMILIAR");
+        radios->activateToggle("FEMALE");
+
         played = 0;
 
         //syncronize data
@@ -1426,7 +1471,7 @@ void testApp::loadTapping(int stage)
             img4->clear();
             img4->loadImage(descImgNames[usert.sounds[usert.currentSound].songID]);
             ofBuffer bufferTala = ofBufferFromFile(descTxtNames[usert.sounds[usert.currentSound].songID]); // reading tala Instructions
-            cout << talaInstr << endl;
+            //cout << talaInstr << endl;
             if (bufferTala.size()>0) talaInstr = bufferTala.getText();
             else talaInstr = "";
             talaDesc->setLabel(talaInstr);
@@ -1554,7 +1599,7 @@ void testApp::loadXmlSettings(string fileName)
 ///USER LIST SAVE/LOAD
 void testApp::saveXmlUser(string fileName)
 {
-    cout << "In the saveXmlUser" << endl;
+    if(verbose) cout << "Saving User Information" << endl;
     //save user to the xml file
     ofxXmlSettings xmlUser;
     xmlUser.addTag( "users" );
@@ -1562,10 +1607,8 @@ void testApp::saveXmlUser(string fileName)
 
     xmlUser.setValue("records", nrUsers);
     xmlUser.setValue("maxID", maxID);
-    cout << nrUsers << endl;
     //add all the existing users
     for(int i = 0; i < nrUsers; i++){
-        cout << "Inside the loop..." << endl;
         //each position tag represents one user
         xmlUser.addTag( "user" );
         xmlUser.pushTag( "user" , i);
@@ -1576,16 +1619,11 @@ void testApp::saveXmlUser(string fileName)
         xmlUser.setValue("date", uDate[i]);
         //use this too if you wanna use quiz
         xmlUser.setValue("age", uAge[i]);
-        cout << "End of the loop..." << endl;
         xmlUser.setValue("gender", uMF[i]);
         xmlUser.setValue("experience", uYears[i]);
-        cout << " EXP in the loop..." << endl;
         xmlUser.setValue("experienceCarnatic", uYearsCarnatic[i]);
-        cout << " EXPCAR in the loop..." << endl;
         xmlUser.setValue("familiarity", uFam[i]);
-        cout << " EXPFAM in the loop..." << endl;
         xmlUser.popTag();//pop position
-        cout << "End of the loop..." << endl;
     }
 
     xmlUser.popTag();
@@ -1622,7 +1660,7 @@ void testApp::loadXmlUser(string fileName)
                     uAge.push_back(xmlUser.getValue("age", 0));
                     uMF.push_back(xmlUser.getValue("gender", 0));
                     uYears.push_back(xmlUser.getValue("experience", 0));
-                    uYears.push_back(xmlUser.getValue("experienceCarnatic", 0));
+                    uYearsCarnatic.push_back(xmlUser.getValue("experienceCarnatic", 0));
                     uFam.push_back(xmlUser.getValue("familiarity", 0));
                     xmlUser.popTag();
                     if (maxID<uIDs[i]) maxID=uIDs[i];
