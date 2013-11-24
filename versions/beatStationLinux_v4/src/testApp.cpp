@@ -282,7 +282,6 @@ void testApp::setup(){
     gui4->addWidgetEastOf(quitButton,"INSTRUCTIONS");
     if (canQuit) quitButton->setVisible(TRUE);
     else quitButton->setVisible(FALSE);
-
     ofxUILabel* playl = new ofxUILabel("PLAY AGAIN", OFX_UI_FONT_SMALL);
     gui4->addWidgetEastOf(playl,"PLAYF");
     gui4->addWidgetEastOf(new ofxUILabel("NEXT SONG", OFX_UI_FONT_SMALL),"NEXTF");
