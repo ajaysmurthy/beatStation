@@ -63,11 +63,11 @@ void testApp::setup() {
 
     if (useMidi)
     {
-    ///////MIDI	INTERFACE
+    ///////MIDI INTERFACE
     /*
-	midiIn.openPort(midiPort);
-	//midiIn.openPort("IAC Pure Data In");	// by name
-	midiIn.ignoreTypes(false, false, false);
+        midiIn.openPort(midiPort);
+        //midiIn.openPort("IAC Pure Data In");        // by name
+        midiIn.ignoreTypes(false, false, false);
     midiIn.addListener((ofxMidiListener *)this);
     */
     }
@@ -138,7 +138,7 @@ void testApp::setup() {
 
 
     //GUI USER
-    gui1 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());		//ofxUICanvas(float x, float y, float width, float height)
+    gui1 = new ofxUICanvas(GUI_xpos,GUI_ypos,ofGetWidth(),ofGetHeight());                //ofxUICanvas(float x, float y, float width, float height)
     gui1->addWidgetDown(new ofxUILabel("CARNATIC MUSIC BEAT STATION", OFX_UI_FONT_LARGE));
     ofxUISpacer* spaceri = new ofxUISpacer(1.1*length, 2, "SPACER");
     gui1->addWidgetDown(spaceri);
@@ -740,13 +740,13 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
 
 //--------------------------------------------------------------
 void testApp::draw() {
-	ofSetColor(0);
+    ofSetColor(0);
     ofBackground(150, 150, 150, 190);
     ofPushStyle();
-	//ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+    //ofEnableBlendMode(OF_BLENDMODE_ALPHA);
 
     // update the sound playing system:
-	ofSoundUpdate();
+    ofSoundUpdate();
 
     if (toggleInstructions1)
     {
@@ -839,15 +839,15 @@ void testApp::exit() {
     delete gui2;
     delete gui3;
     delete gui4;
-	delete gui5;
+    delete gui5;
     delete img;
 
     if (useMidi)
     {
 
-	// clean up
-	//midiIn.closePort();
-	//midiIn.removeListener(this);
+        // clean up
+        //midiIn.closePort();
+        //midiIn.removeListener(this);
 
     }
 }
@@ -856,8 +856,8 @@ void testApp::exit() {
 /*
 void testApp::newMidiMessage(ofxMidiMessage& msg) {
 
-	// make a copy of the latest message
-	midiMessage = msg;
+        // make a copy of the latest message
+        midiMessage = msg;
 }
 */
 
@@ -943,7 +943,7 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
     ofxUIButton *button = (ofxUIButton *) e.widget;
 
     //START TEST
-	if ((wname == "START") && (button->getValue()==1))
+        if ((wname == "START") && (button->getValue()==1))
     {
         ofxUILabel *errors = (ofxUILabel*) gui1->getWidget("ERRORS");
 
@@ -1012,7 +1012,7 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
     }
 
     //SCORE TABLE
-	if ((wname == "SCORES") && (button->getValue()==1))
+        if ((wname == "SCORES") && (button->getValue()==1))
     {
         getScoreTable();
         toggleScore = !toggleScore;
@@ -1074,7 +1074,7 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
         expCarnaticLabel << (int)expValCar << " YEARS";
     }
     expSliderValCarnatic->setLabel(expCarnaticLabel.str());
-	if ((wname == "NEXT") && (button->getValue()==1))
+        if ((wname == "NEXT") && (button->getValue()==1))
     {
         ofxUILabel *errors = (ofxUILabel*) gui2->getWidget("ERRORS");
         bool nextStep = TRUE;
@@ -1143,7 +1143,7 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
     ofxUIButton *button = (ofxUIButton *) e.widget;
 
     //START TEST
-	if ((wname == "START") && (button->getValue()==1))
+        if ((wname == "START") && (button->getValue()==1))
     {
         //LOAD TAPPING INTERFACE
         loadTapping(1);
@@ -1157,7 +1157,7 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
     ofxUIButton *button = (ofxUIButton *) e.widget;
 
     //play a song
-	if ((e.widget->getName() == "PLAYF") && (button->getValue()==1))
+        if ((e.widget->getName() == "PLAYF") && (button->getValue()==1))
     {
         if (!beats.isLoaded()) { cout << "sound failed to load" << endl; }
         else if ((!beats.getIsPlaying()) && (played<noPlays))
@@ -1267,7 +1267,7 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
     }
 
     //quit tapping to the log-in
-	if ((e.widget->getName() == "QUIT") && (button->getValue()==1))
+        if ((e.widget->getName() == "QUIT") && (button->getValue()==1))
     {
         //if (beats.getIsPlaying()) {return;} //everything is inactive when sound is playing
         //else
@@ -2049,3 +2049,4 @@ void testApp::getScoreTable()
     scoreTable4.setColor(240, 240, 240, 180);
 
 }
+

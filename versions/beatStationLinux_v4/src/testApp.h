@@ -99,6 +99,7 @@ public:
     ofxUILabel *talaDesc;
     ofxUILabel *imageInfo;
     ofxUIRadio *radios;
+    ofxUIRadio *radio;
     //ofxUIRadio *radioTrain;
     //ofxUIRadio *radioTrainCarnatic;
     ofxUIRadio *radiofam;

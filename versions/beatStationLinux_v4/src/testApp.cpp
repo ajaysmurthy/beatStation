@@ -148,7 +148,7 @@ void testApp::setup(){
     gui1->addWidgetSouthOf(new ofxUITextInput("ID", "", (length-xInit)/2),NAME_STRING);
     vector<string> vnames; vnames.push_back("NEW"); vnames.push_back("EXISTING");
     //ofxUIRadio *radio = (ofxUIRadio *) gui1->addWidgetDown(new ofxUIRadio("USER", vnames, OFX_UI_ORIENTATION_VERTICAL, dim, dim ));
-    ofxUIRadio *radio = new ofxUIRadio("USER", vnames, OFX_UI_ORIENTATION_VERTICAL, dim, dim );
+    radio = new ofxUIRadio("USER", vnames, OFX_UI_ORIENTATION_VERTICAL, dim, dim );
     radio->activateToggle("NEW");
     newUser = TRUE;
 
@@ -1394,13 +1394,13 @@ void testApp::guiEvent5(ofxUIEventArgs &e)
 
         //syncronize data
         //loadXmlUser("data/users.xml");
-
+        //cout << "I was here" << endl;
         //load the gui1
         toggleInstructions1 = TRUE;
         toggleInstructions11 = TRUE;
         toggleInstructions3 = FALSE;
         button->setValue(FALSE);
-        ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
+        //ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
         radio->activateToggle("NEW");
         newUser = TRUE;
         ofxUILabel *label = (ofxUILabel *) gui1->getWidget(NAME_STRING);
