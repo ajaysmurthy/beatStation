@@ -1,0 +1,25 @@
+<settings>
+    <passToExit>exit</passToExit>
+    <verbose>0</verbose>
+    <fullscreen>0</fullscreen>
+    <fps>1000</fps>
+    <midiPort>0</midiPort>
+    <midiChannel>0</midiChannel>
+    <midiNote>0</midiNote>
+    <noPlays>2</noPlays>
+    <minTaps>1</minTaps>
+    <randomFiles>1</randomFiles>
+    <tapWithSpace>1</tapWithSpace>
+    <tapWithTab>1</tapWithTab>
+    <codeKeySpace>32</codeKeySpace>
+    <codeKeyTab>115</codeKeyTab>
+    <canQuit>0</canQuit>
+    <testType>1</testType>
+    <itemDimGUI>24</itemDimGUI>
+    <launchScript>0</launchScript>
+    <scriptDirectory>XML4MAT</scriptDirectory>
+    <appToLaunchPath>/Applications/Octave.app/Contents/Resources/bin/octave -qf --quiet --eval "clear all; cd path; tapping2('xmlin','xmlout');exit;"</appToLaunchPath>
+    <isClient>0</isClient>
+    <tcpPort>9001</tcpPort>
+    <ipServer>127.0.0.1</ipServer>
+</settings>

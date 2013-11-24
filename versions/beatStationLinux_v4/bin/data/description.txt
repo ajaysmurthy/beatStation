@@ -1,0 +1,12 @@
+Welcome to the Carnatic music beat station!
+<> <>
+This is a tapping station where you will listen to a music excerpt and tap on the keyboard to its beat. 
+<> <>
+Rhythm in Carnatic music is based on the tala, which consists of time cycles. Each tala cycle consists of several beats and the start of the cycle called the 'sama'. You will now listen to several 30 second long Carnatic music excerpts. For each excerpt, you will tap to the beat of the music excerpt. Please tap to what you perceive as the most predominant beat. In addition, you can also tap on the 'sama' using a different key. For the samas, please tap to what you perceive as the start of the tala cycles. 
+<> <>
+The responses will be recorded anonymously and no identifiable personal information will be stored. You need to be above the age of 18 to participate. The tapping responses you provide will be used to  develop better rhythm analysis algorithms for Carnatic music. 
+<> <>
+This test will take about 15 minutes to complete. 
+<> <>
+Thank you for your participation! Happy Tapping!
+<> <>

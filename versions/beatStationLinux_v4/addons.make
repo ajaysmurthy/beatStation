@@ -1,0 +1,5 @@
+ofxNetwork
+ofxXmlSettings
+ofxDirList
+ofxUI
+ofxTextSuite
