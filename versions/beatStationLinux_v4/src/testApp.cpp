@@ -163,7 +163,7 @@ void testApp::setup(){
     //gui1->addWidgetSouthOf(new ofxUITextInput("ID", "", (length-xInit)/2),NAME_STRING);
     ofxUILabel *errors = (ofxUILabel*) new ofxUILabel("ERRORS", OFX_UI_FONT_SMALL);
     errors->setVisible(FALSE);
-    gui1->addWidgetSouthOf(errors,"ID");
+    gui1->addWidgetEastOf(errors,"START");
     imgCC = new ofImage();
     imgCC->loadImage("logos.png");
     guimgCC = new ofxUIImage(20, ofGetHeight()/2, imgCC->width, imgCC->height, imgCC, "logos",false);
